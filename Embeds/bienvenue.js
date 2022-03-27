@@ -1,9 +1,7 @@
 const { MessageEmbed, Message } = require('discord.js');
 
 module.exports = async (client) =>{
-    
-    
-    
+   
     const embed = new MessageEmbed()
 	.setColor('#c7c7c7')
 	.setTitle(`**               ** BIENVENUE DANS LE SERVEUR DU CLAN SN3T`)
@@ -43,7 +41,6 @@ module.exports = async (client) =>{
         ],
 
     }
-
 
 
     const channel = await client.channels.fetch('957073975891091486')

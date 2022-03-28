@@ -10,14 +10,19 @@ module.exports = async (client, interaction) => {
         case welcomeMessage.id:
 
             const channelAnnoncesInvites = await client.channels.fetch('957806378599219250')
+            const channelDiscussionsInvites = await client.channels.fetch('957961040405094410')
+            const channelPostulerInvites = await client.channels.fetch('957962440312782898')
             const user = interaction.member
             let roles = interaction.member.roles.cache
 
 
             if (interaction.customId === '0') {
-                if (user._roles.size > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
+                console.log(user.roles.cache.some(role => role.name === 'Invité'));
+                console.log(user._roles > 0);
+                if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
+                    
                     interaction.reply({
-                        content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans {channel} pour discuter avec nous et dans {channel} pour postuler.`, ephemeral: true
+                        content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
                     })
                 }
                 else if (user._roles > 0) {
@@ -37,7 +42,6 @@ module.exports = async (client, interaction) => {
             else {
                 let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
                 const isInvite = user.roles.cache.has(role.id)
-                console.log(isInvite);
                 console.log(user._roles);
                 console.log(user._roles && true);
                 if (user._roles.length > 0 && !isInvite) {
@@ -45,7 +49,6 @@ module.exports = async (client, interaction) => {
                 }
                 else {
 
-                    if (isInvite) await user.roles.remove(role);
                     const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
                     dm = await user.createDM(true)
 

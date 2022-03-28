@@ -58,7 +58,9 @@ module.exports = async (client, interaction) => {
                 }
                 interaction.followUp(`Félicitations ${interaction.user}! Tu as désormais le rôle '${newRole.name}'`)
                 if (server_member.roles.cache.some(r => r.name === inviteRole.name)) {
+                    await server_member.roles.remove(inviteRole);
                     channelAnnoncesInvites.send({
+                        
                         content: `${interaction.user} est maintenant ${newRole}!`
                     })
                 }

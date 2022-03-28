@@ -8,6 +8,6 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply({ephemeral:true}).catch(() => {});
         await interaction.followUp({content:`${client.ws.ping}ms!`})
-        await interaction.deleteReply()
+        // await interaction.deleteReply()
     },  
 };

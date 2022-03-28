@@ -3,86 +3,229 @@ const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const axios = require('../axios/axios')
 
 module.exports = async (client, interaction) => {
-    const welcomeChannel = await client.channels.fetch('957073975891091486')
+    const welcomeChannel = await client.channels.fetch('957073975891091486') //Channel accueil
     const messages = await welcomeChannel.messages.fetch()
     const welcomeMessage = messages.first()
+
+    const gdcChannel = await client.channels.fetch('957074488137240587') //Channel annonces gdc
+    const pinnedMessages = await gdcChannel.messages.fetchPinned()
+    var pollMessage = null
+
+    for(var msg of pinnedMessages) {
+        if(msg[1].embeds[0].title === '**               ** ⚔ Votation Prochaine GDC ⚔'){
+            pollMessage = msg[1]
+        }
+    }
     switch (interaction.message.id) {
         case welcomeMessage.id:
+            try {
+                const channelAnnoncesInvites = await client.channels.fetch('957806378599219250')
+                const channelDiscussionsInvites = await client.channels.fetch('957961040405094410')
+                const channelPostulerInvites = await client.channels.fetch('957962440312782898')
+                const user = interaction.member
+                let roles = interaction.member.roles.cache
 
-            const channelAnnoncesInvites = await client.channels.fetch('957806378599219250')
-            const channelDiscussionsInvites = await client.channels.fetch('957961040405094410')
-            const channelPostulerInvites = await client.channels.fetch('957962440312782898')
-            const user = interaction.member
-            let roles = interaction.member.roles.cache
 
+                if (interaction.customId === '0') {
+                    console.log(user.roles.cache.some(role => role.name === 'Invité'));
+                    console.log(user._roles > 0);
+                    if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
+                        
+                        interaction.reply({
+                            content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
+                        })
+                    }
+                    else if (user._roles > 0) {
+                        interaction.reply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
+                    }
+                    else {
 
-            if (interaction.customId === '0') {
-                console.log(user.roles.cache.some(role => role.name === 'Invité'));
-                console.log(user._roles > 0);
-                if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
-                    
-                    interaction.reply({
-                        content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
-                    })
-                }
-                else if (user._roles > 0) {
-                    interaction.reply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
-                }
-                else {
-
-                    let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                    await user.roles.add(role);
-                    interaction.reply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
-                    channelAnnoncesInvites.send({
-                        content: `${interaction.member} vient d'arriver et est désormais un ${role}`
-                    })
-                }
-
-            }
-            else {
-                let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                const isInvite = user.roles.cache.has(role.id)
-                console.log(user._roles);
-                console.log(user._roles && true);
-                if (user._roles.length > 0 && !isInvite) {
-                    interaction.reply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
-                }
-                else {
-
-                    const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
-                    dm = await user.createDM(true)
-
-                    const messages = await dm.messages.fetch()
-                    if (messages.size > 0) {
-
-                        for (const message of messages) {
-                            if (message[1].author.bot === true) {
-                                await message[1].delete();
-                            }
-                        }
+                        let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
+                        await user.roles.add(role);
+                        interaction.reply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
+                        channelAnnoncesInvites.send({
+                            content: `${interaction.member} vient d'arriver et est désormais un ${role}`
+                        })
                     }
 
-                    var options = []
-                    player_tags.data.items.forEach(player => {
-                        let { tag, name, role } = player
-                        let option = {
-                            label: name,
-                            value: tag
+                }
+                else {
+                    let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
+                    const isInvite = user.roles.cache.has(role.id)
+                    console.log(user._roles);
+                    console.log(user._roles && true);
+                    if (user._roles.length > 0 && !isInvite) {
+                        interaction.reply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                    }
+                    else {
+
+                        const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
+                        dm = await user.createDM(true)
+
+                        const messages = await dm.messages.fetch()
+                        if (messages.size > 0) {
+
+                            for (const message of messages) {
+                                if (message[1].author.bot === true) {
+                                    await message[1].delete();
+                                }
+                            }
                         }
-                        options.push(option)
-                        console.log(name);
-                    })
-                    const row = new MessageActionRow()
-                        .addComponents(
-                            new MessageSelectMenu()
-                                .setCustomId('player-selection')
-                                .setPlaceholder('Sélectionnez votre nom')
-                                .addOptions(options),
-                        );
-                    dm.send({ components: [row] })
+                        var options = []
+                        player_tags.data.items.forEach(player => {
+                            let { tag, name, role } = player
+                            let option = {
+                                label: name,
+                                value: tag
+                            }
+                            options.push(option)
+                            console.log(name);
+                        })
+                        const row = new MessageActionRow()
+                            .addComponents(
+                                new MessageSelectMenu()
+                                    .setCustomId('player-selection')
+                                    .setPlaceholder('Sélectionnez votre nom')
+                                    .addOptions(options),
+                            );
+                        dm.send({ components: [row] })
+
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                
+            }
+
+            
+            break;
+        case pollMessage.id:
+            const votesChannel = await client.channels.fetch('958006351580266518')
+            const messages = await votesChannel.messages.fetch();
+            if (interaction.customId === 'war-0') {
+                for(var msg of messages){
+                    if (msg[1].embeds[0].title == 'Joueurs prochaine GDC'){
+                        const menu1 = msg[1].components[0].components[0]
+                        const menu2 = msg[1].components[1].components[0]
+
+                        if(menu2.options.length == 1 && menu2.options[0].value == '-1'){ //Only 1 option and it's value -1
+                            menu2.spliceOptions(0,1)
+                            menu2.addOptions({
+                                'label': interaction.member.displayName,
+                                'value': interaction.member.displayName,
+                                'description': 'Ne veut pas être en guerre'
+                            })
+                            for(let memberIndex in menu1.options){
+                                if(menu1.options[memberIndex].value == interaction.member.displayName){
+                                    menu1.spliceOptions(memberIndex,1)
+                                    if(menu1.options.length == 0){
+                                        menu1.addOptions({
+                                            'label': 'Pas de votes',
+                                            'value': '-1',
+                                        })
+                                    }
+                                }
+                            }
+                            await msg[1].edit({ 'components': msg[1].components })
+                            return interaction.reply({content:`✅ Ton vote a bien été pris en compte ${interaction.member} ✅`, ephemeral: true})
+                        }
+                        else{                                                          //At least 1 member
+                            for(let member of menu2.options){
+                                if (member.value == interaction.member.displayName){
+                                    return interaction.reply({content:`❌ Tu as déjà voté pour être en GDC ${interaction.member} ❌`, ephemeral: true})
+                                }
+                            }
+                            for(let memberIndex in menu1.options){
+                                if(menu1.options[memberIndex].value == interaction.member.displayName){
+                                    menu1.spliceOptions(memberIndex,1)
+                                    if(menu1.options[memberIndex].value == interaction.member.displayName){
+                                        menu1.spliceOptions(memberIndex,1)
+                                        if(menu1.options.length == 0){
+                                            menu1.addOptions({
+                                                'label': 'Pas de votes',
+                                                'value': '-1',
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+                            menu2.addOptions({
+                                'label': interaction.member.displayName,
+                                'value': interaction.member.displayName,
+                                'description': 'Ne veut pas être en guerre'
+                            })
+                            await msg[1].edit({ 'components': msg[1].components })
+                            return interaction.reply({content:`✅ Ton vote a bien été pris en compte ${interaction.member} ✅`, ephemeral: true})
+                        }
+                        
+                    }
 
                 }
+                console.log('No war');
             }
+            else{
+                for(var msg of messages){
+                    if (msg[1].embeds[0].title == 'Joueurs prochaine GDC'){
+                        const menu1 = msg[1].components[0].components[0]
+                        const menu2 = msg[1].components[1].components[0]
+
+                        if(menu1.options.length == 1 && menu1.options[0].value == '-1'){ //Only 1 option and it's value -1
+                            menu1.spliceOptions(0,1)
+                            menu1.addOptions({
+                                'label': interaction.member.displayName,
+                                'value': interaction.member.displayName,
+                                'description': 'Veut être en guerre'
+                            })
+                            for(let memberIndex in menu2.options){
+                                console.log(memberIndex);
+                                if(menu2.options[memberIndex].value == interaction.member.displayName){
+                                    menu2.spliceOptions(memberIndex,1)
+                                    if(menu2.options.length == 0){
+                                        menu2.addOptions({
+                                            'label': 'Pas de votes',
+                                            'value': '-1',
+                                        })
+                                    }
+                                }
+                            }
+                            await msg[1].edit({ 'components': msg[1].components })
+                            return interaction.reply({content:`✅ Ton vote a bien été pris en compte ${interaction.member}✅`, ephemeral: true})
+                        }
+                        else{                                                          //At least 1 member
+                            for(let member of menu1.options){
+                                if (member.value == interaction.member.displayName){
+                                    return interaction.reply({content:`❌ Tu as déjà voté pour être en GDC ${interaction.member} ❌`, ephemeral: true})
+                                }
+                            }
+                            for(let memberIndex in menu2.options){
+                                if(menu2.options[memberIndex].value == interaction.member.displayName){
+                                    menu2.spliceOptions(memberIndex,1)
+                                    if(menu2.options[memberIndex].value == interaction.member.displayName){
+                                        menu2.spliceOptions(memberIndex,1)
+                                        if(menu2.options.length == 0){
+                                            menu2.addOptions({
+                                                'label': 'Pas de votes',
+                                                'value': '-1',
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+                            menu1.addOptions({
+                                'label': interaction.member.displayName,
+                                'value': interaction.member.displayName,
+                                'description': 'Veut être en guerre'
+                            })
+                            await msg[1].edit({ 'components': msg[1].components })
+                            return interaction.reply({content:`✅ Ton vote a bien été pris en compte ${interaction.member}✅`, ephemeral: true})
+                        }
+                        
+                    }
+
+                }
+                console.log('Yes war');
+            }
+            break;
 
     }
 }

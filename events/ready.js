@@ -1,7 +1,12 @@
 const client = require("../index");
-const bienvenue = require('../Embeds/bienvenue.js');
+const bienvenue = require('../auto/bienvenue.js');
+const clanWarPoll = require('../auto/clanWarPoll.js');
 
-client.on("ready", () =>{
-    console.log(`${client.user.username} is up and ready to go!`)
+
+
+
+
+client.on("ready", async () =>{
     bienvenue(client)
+    clanWarPoll(client)
 });

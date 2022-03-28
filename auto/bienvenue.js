@@ -49,14 +49,7 @@ module.exports = async (client) =>{
     if (messages.size === 0){
         channel.send(msg);
     }
-    else{
-
-        for (const message of messages){
-            await message[1].delete();
-        }
-        channel.send(msg);
-        
-    }
+   
 
     
 

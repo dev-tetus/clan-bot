@@ -10,16 +10,18 @@ const slashCommandInteraction = require('../interactions/slashCommandInteraction
 
 client.on("interactionCreate", async (interaction) => {
     try {
-        await interaction.deferReply({ephemeral: true})
+        
         // Slash Command Handling
         if (interaction.isCommand()) {
             slashCommandInteraction(client, interaction)
         }
         else if (interaction.isButton()) {
-            
+            await interaction.deferReply({ephemeral: true})
             await buttonInteraction(client, interaction)
         }
         else if (interaction.isSelectMenu()) {
+            await interaction.deferReply({ephemeral: true})
+
             await menuSelectionInteraction(client, interaction)
         }
 
@@ -30,6 +32,7 @@ client.on("interactionCreate", async (interaction) => {
             if (command) command.run(client, interaction);
         }
     } catch (error) {
+        console.log(error);
         interaction.editReply({content:`Désolé, une erreur est parvenue, veuillez attendre un instant et réessayer, merci!`, ephemeral: true})
         .catch(e => console.log(e))
     }

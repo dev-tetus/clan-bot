@@ -25,7 +25,6 @@ module.exports = async (client, interaction) => {
                 const user = interaction.member
                 let roles = interaction.member.roles.cache
 
-
                 if (interaction.customId === '0') {
                     
                     if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
@@ -34,8 +33,12 @@ module.exports = async (client, interaction) => {
                             content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
                         })
                     }
-                    else if (user._roles.length > 0) {
-                        interaction.editReply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
+                    else if ((!roles.some(role => role.name === 'Invité'))&&(user._roles.length > 0)) {
+                        if(roles.some(r => r.name == 'Dev')){
+                            return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
+                        }
+                        
+                        return await interaction.editReply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
                     }
                     else {
 
@@ -49,16 +52,57 @@ module.exports = async (client, interaction) => {
 
                 }
                 else {
+
                     let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                    const isInvite = user.roles.cache.has(role.id)
-                    console.log(user._roles);
-                    console.log(user._roles && true);
-                    if (user._roles.length > 0 && !isInvite) {
-                        interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                    const isInvite = user.roles.cache.some(r => r.name === 'Invité')
+                    const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
+
+
+                    if ((user._roles.length >= 1 && !isInvite)) {
+                        
+                        if(user._roles.length == 1 && !roles.some(r => r.name === 'Server Booster')){
+                            return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                        }
+                        else if(user._roles.length > 2 && roles.some(r=>r.name==='Dev')){
+                            return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
+                        }
+                        else if (roles.some(r => r.name === 'Server Booster')){
+                            dm = await user.createDM(true)
+
+                            const messages = await dm.messages.fetch()
+                            if (messages.size > 0) {
+
+                                for (const message of messages) {
+                                    if (message[1].author.bot === true) {
+                                        await message[1].delete();
+                                    }
+                                }
+                            }
+                            var options = []
+                            player_tags.data.items.forEach(player => {
+                                let { tag, name, role } = player
+                                let option = {
+                                    label: name,
+                                    value: tag
+                                }
+                                options.push(option)
+                            })
+                            const row = new MessageActionRow()
+                                .addComponents(
+                                    new MessageSelectMenu()
+                                        .setCustomId('player-selection')
+                                        .setPlaceholder('Sélectionnez votre nom')
+                                        .addOptions(options),
+                                );
+                            dm.send({ components: [row] })
+                            return await interaction.editReply({content:`Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`})
+
+                        }
+                        return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                        
+                        
                     }
                     else {
-
-                        const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
                         dm = await user.createDM(true)
 
                         const messages = await dm.messages.fetch()
@@ -88,6 +132,7 @@ module.exports = async (client, interaction) => {
                                     .addOptions(options),
                             );
                         dm.send({ components: [row] })
+                        return await interaction.editReply({content:`Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`})
 
                     }
                 }

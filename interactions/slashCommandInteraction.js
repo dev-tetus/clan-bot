@@ -6,9 +6,7 @@ module.exports = async (client, interaction) => {
         return interaction.followUp({ content: "An error has occured " });
 
     const args = [];
-    console.log(cmd);
-    console.log(commandChannel);
-    console.log((interaction.channelId != commandChannel.guildId) && (interaction.member.roles.cache.some(r => r.name == 'Dev')));
+    
     if((interaction.channelId != commandChannel.guildId) && !interaction.member.roles.cache.some(r => r.name == 'Dev')){
         return await interaction.editReply({ content:"Les commandes pour le bot c'est pas là", ephemeral:true})
     }

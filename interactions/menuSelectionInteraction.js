@@ -15,106 +15,102 @@ module.exports = async (client, interaction) => {
         const filter = (m) => {
             return m.content.length == 8 
         }
-
-
         var response = null
         var user_tag = null
         var menu = null
         
-        const collector = channel.createMessageCollector({ filter: filter, idle: 120000 });
+        const collector = channel.createMessageCollector({ filter: filter, max:1,idle: 15000});
         collector.on('collect', async (code) => {
-                
             user_tag = interaction.values[0].replace('#', '%23')
             try {
                 response = await axios.post(`/players/${user_tag}/verifytoken`, {
                     token: code.content,
                 })
+                console.log(response);
             } catch (error) {
-                return
             }
-                
         })
         collector.on('end', async (collected,reason) =>{
-            let found = false
-            if (collected.size == 0){
-                await interaction.followUp({content: 'Pas de code valide reçu après 2 minutes, veuillez bien recommencer la manip', ephemeral: true})
-                for(var message of channel.messages.cache){
-                    if(message[1].author.bot){
-                        if((message[1].type !== 'REPLY' )&&(message[1].components[0].components[0].customId == 'player-selection' && !found)){
-                            menu = message[1].components
-                            found = true
-                            await message[1].delete()
-                        }
-                        else if(message[1].type !== 'REPLY'){
-                            await message[1].delete()
-                        }
-                        
-                    }
-                }
-                console.log('here');
-                console.log(menu);
-                channel.send({components:menu})
-                    .then((msg) => {console.log(msg);})
-                    .catch((e) =>{console.log(e);})
-                return
 
+            if (response != null && response.data.status == 'invalid') {
+                await interaction.followUp(`Désolé ${interaction.user}, mais nous n'avons pas pu vérifier l'authenticité du compte\nLe code n'est pas valide ou n'est pas associé au compte sélectionné (${interaction.values[0]})\nVeuillez essayer à nouveau...`)
             }
-        })
- 
-        if (response != null && response.data.status == 'invalid') {
-            await interaction.followUp(`Désolé ${interaction.user}, mais nous n'avons pas pu vérifier l'authenticité du compte\nLe code n'est pas valide ou n'est pas associé au compte sélectionné (${interaction.values[0]})\nVeuillez essayer à nouveau...`)
-        }
-        else {
-            if(user_tag) {
-                const player_role = await axios.get(`/players/${user_tag}`)
-                var newRole = null
-    
-                const guild = client.guilds.cache.get(process.env.GUILD_ID)
-                const inviteRole = guild.roles.cache.find(r => r.name == 'Invité')
-                const server_member = await guild.members.fetch(interaction.user)
-    
-                switch (player_role.data.role) {
-                    case 'leader':
-                        const leaderRole = guild.roles.cache.find(r => r.name == 'Chef')
-                        server_member.roles.add(leaderRole)
-                        newRole = leaderRole
-                        break;
-                    case 'coLeader':
-                        const coLeaderRole = guild.roles.cache.find(r => r.name == 'Chef Adjoint')
-                        server_member.roles.add(coLeaderRole)
-                        newRole = coLeaderRole
-                        break;
-                    case 'veteran':
-                        const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
-                        server_member.roles.add(veteranRole)
-                        newRole = veteranRole
-                        break;
-                    case 'member':
-                        const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
-                        server_member.roles.add(memberRole)
-                        newRole = memberRole
-                        break;
-                }
-                await interaction.followUp(`Félicitations ${interaction.user}! Tu as désormais le rôle '${newRole.name}'`)
-                if (server_member.roles.cache.some(r => r.name === inviteRole.name)) {
-                    await server_member.roles.remove(inviteRole);
-                    channelAnnoncesInvites.send({
-                        
-                        content: `${interaction.user} est maintenant ${newRole}!`
-                    })
-                }
-                else {
-                    channelAnnoncesInvites.send({
-                        content: `${interaction.user} vient d'arriver en étant ${newRole}!`
-                    })
-    
-                }
-            }    
-
-
-        }
-    }
+            else {
+                console.log(user_tag);
+                if(user_tag) {
+                    const player_role = await axios.get(`/players/${user_tag}`)
+                    var newRole = null
         
+                    const guild = client.guilds.cache.get(process.env.GUILD_ID)
+                    const inviteRole = guild.roles.cache.find(r => r.name == 'Invité')
+                    const server_member = await guild.members.fetch(interaction.user)
+        
+                    switch (player_role.data.role) {
+                        case 'leader':
+                            const leaderRole = guild.roles.cache.find(r => r.name == 'Chef')
+                            server_member.roles.add(leaderRole)
+                            newRole = leaderRole
+                            break;
+                        case 'coLeader':
+                            const coLeaderRole = guild.roles.cache.find(r => r.name == 'Chef Adjoint')
+                            server_member.roles.add(coLeaderRole)
+                            newRole = coLeaderRole
+                            break;
+                        case 'veteran':
+                            const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
+                            server_member.roles.add(veteranRole)
+                            newRole = veteranRole
+                            break;
+                        case 'member':
+                            const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
+                            server_member.roles.add(memberRole)
+                            newRole = memberRole
+                            break;
+                    }
+                    await interaction.followUp(`Félicitations ${interaction.user}! Tu as désormais le rôle '${newRole.name}'`)
+                    if (server_member.roles.cache.some(r => r.name === inviteRole.name)) {
+                        await server_member.roles.remove(inviteRole);
+                        channelAnnoncesInvites.send({
+                            
+                            content: `${interaction.user} est maintenant ${newRole}!`
+                        })
+                    }
+                    else {
+                        channelAnnoncesInvites.send({
+                            content: `${interaction.user} vient d'arriver en étant ${newRole}!`
+                        })
+        
+                    }
+                }    
+    
+    
+            }
 
+        })  
+        //     let found = false
+        //     if (collected.size == 0){
+        //         await interaction.followUp({content: 'Pas de code valide reçu après 2 minutes, veuillez bien recommencer la manip', ephemeral: true})
+        //         for(var message of channel.messages.cache){
+        //             if(message[1].author.bot){
+        //                 if((message[1].type !== 'REPLY' )&&(message[1].components[0].components[0].customId == 'player-selection' && !found)){
+        //                     menu = message[1].components
+        //                     found = true
+        //                     await message[1].delete()
+        //                 }
+        //                 else if(message[1].type !== 'REPLY'){
+        //                     await message[1].delete()
+        //                 }
+                        
+        //             }
+        //         }
+        //         console.log('here');
+        //         console.log(menu);
+        //         channel.send({components:menu})
+        //             .then((msg) => {console.log(msg);})
+        //             .catch((e) =>{console.log(e);})
+        //         return
 
+        //     }
+        // })
+    }
 }

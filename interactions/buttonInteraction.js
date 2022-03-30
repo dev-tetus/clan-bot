@@ -3,12 +3,12 @@ const { MessageActionRow, MessageSelectMenu} = require('discord.js');
 const axios = require('../axios/axios')
 
 module.exports = async (client, interaction) => {
-    const welcomeChannel = await client.channels.fetch('957073975891091486') //Channel accueil
-    const messages = await welcomeChannel.messages.fetch()
-    const welcomeMessage = messages.first()
+    const channelBienvenu = await client.channels.cache.find(ch => ch.name =='1-bienvenue')
+    const messagesBienvenu = await channelBienvenu.messages.fetch()
+    const welcomeMessage = messagesBienvenu.first()
 
-    const gdcChannel = await client.channels.fetch('957074488137240587') //Channel annonces gdc
-    const pinnedMessages = await gdcChannel.messages.fetchPinned()
+    const clanWarAnnoncesChannel = await client.channels.cache.find(ch=>ch.name == 'annonces' && ch.parent.name == '⚔· GDC') //Channel annonces gdc
+    const pinnedMessages = await clanWarAnnoncesChannel.messages.fetchPinned()
     var pollMessage = null
 
     for(var msg of pinnedMessages) {
@@ -19,9 +19,9 @@ module.exports = async (client, interaction) => {
     switch (interaction.message.id) {
         case welcomeMessage.id:
             try {
-                const channelAnnoncesInvites = await client.channels.fetch('957806378599219250')
-                const channelDiscussionsInvites = await client.channels.fetch('957961040405094410')
-                const channelPostulerInvites = await client.channels.fetch('957962440312782898')
+                const channelAnnoncesInvites = await client.channels.cache.find(ch => ch.name =='qui-est-arrivé')
+                const channelDiscussionsInvites = await client.channels.cache.find(ch => ch.name =='discussion-invités')
+                const channelPostulerInvites = await client.channels.cache.find(ch => ch.name =='postuler')
                 const user = interaction.member
                 let roles = interaction.member.roles.cache
 
@@ -173,7 +173,7 @@ module.exports = async (client, interaction) => {
             break;
         case pollMessage.id:
             try {
-                const votesChannel = await client.channels.fetch('958006351580266518')
+                const votesChannel = await client.channels.cache.find(ch => ch.name =='votes')
                 const messages = await votesChannel.messages.fetch();
                 if (interaction.customId === 'war-0') {
                     for(var msg of messages){

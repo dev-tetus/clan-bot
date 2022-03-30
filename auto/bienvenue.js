@@ -1,7 +1,7 @@
 const { MessageEmbed, Message } = require('discord.js');
 
 module.exports = async (client) => {
-    const server = await client.guilds.fetch('957059703458902016')
+    const server = await client.guilds.fetch(process.env.GUILD_ID)
     const channelCommandes = await server.channels.cache.find(r => r.name == 'commandes')
     console.log(server);
 
@@ -64,11 +64,11 @@ module.exports = async (client) => {
                 },
                 {
                     "name": "☕  __Pour les invités__",
-                    "value": `**\n**__Tous les channels__ sont visibles mais pas tous sont accéssibles a l'intéraction ou même aux historiques de ceux-là.\n\nLa catégorie **${await server.channels.fetch('957806046888484864')}** est dédié à vous, crée pour que vous puissez discuter non seulement avec nous mais entre ${server.roles.cache.find(r => r.name == 'Invité')}.\n\nDans cette catégorie vous retrouverez le channel ${await server.channels.fetch('957961040405094410')} pour engager une conversation et ${await server.channels.fetch('957962440312782898')} pour vous annoncer si jamais vous désirez nous rejoindre.\n**\n**`
+                    "value": `**\n**__Tous les channels__ sont visibles mais pas tous sont accéssibles a l'intéraction ou même aux historiques de ceux-là.\n\nLa catégorie **${await server.channels.cache.find(ch=>ch.name == '🧑🤝🧑· Invités')}** est dédié à vous, crée pour que vous puissez discuter non seulement avec nous mais entre ${server.roles.cache.find(r => r.name == 'Invité')}.\n\nDans cette catégorie vous retrouverez le channel ${await server.channels.cache.find(ch=>ch.name == 'discussion-invités')} pour engager une conversation et ${await server.channels.cache.find(ch=>ch.name == 'postuler')} pour vous annoncer si jamais vous désirez nous rejoindre.\n**\n**`
                 },
                 {
                     "name": "⚔️  __Pour les membres du clan__",
-                    "value": `**\n**Tous les channels sont accésibles pour vous à l'intéraction, comme vous pouvez constater, il existe une catégorie par évènement.\n\nIl existe aussi un channel ${await server.channels.fetch('957074488137240587')} par catégorie dans lequel nous posterons des infos importantes à lire dans le contexte de l'évènement.\n\n${client.user} utilisera aussi ces channels pour envoyer des messages automatiques avec des infos sur l'évènement`
+                    "value": `**\n**Tous les channels sont accésibles pour vous à l'intéraction, comme vous pouvez constater, il existe une catégorie par évènement.\n\nIl existe aussi un channel ${await server.channels.cache.find(ch=>ch.name == 'annonces')} par catégorie dans lequel nous posterons des infos importantes à lire dans le contexte de l'évènement.\n\n${client.user} utilisera aussi ces channels pour envoyer des messages automatiques avec des infos sur l'évènement`
                 }
             ]
         },
@@ -178,14 +178,14 @@ module.exports = async (client) => {
 
     }
 
-    const channelBienvenu = await client.channels.fetch('957073975891091486')
+    const channelBienvenu = await client.channels.cache.find(ch => ch.name =='1-bienvenue')
     const messagesBienvenu = await channelBienvenu.messages.fetch()
 
 
-    const channelDescription = await client.channels.fetch('957077823720423516')
+    const channelDescription = await client.channels.cache.find(ch => ch.name =='2-description')
     const messagesDescription = await channelDescription.messages.fetch()
 
-    const channelGuideCommandes = await client.channels.fetch('957089459072028672')
+    const channelGuideCommandes = await client.channels.cache.find(ch => ch.name =='guide')
     const messagesGuideCommandes = await channelGuideCommandes.messages.fetch()
 
     if (messagesBienvenu.size === 0) {

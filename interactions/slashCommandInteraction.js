@@ -1,5 +1,5 @@
 module.exports = async (client, interaction) => {
-    const commandChannel = await client.channels.fetch('957089428608786502')
+    const commandChannel = await client.channels.cache.find(ch=>ch.name=='commandes')
     
     const cmd = client.slashCommands.get(interaction.commandName);
     if (!cmd)
@@ -7,7 +7,7 @@ module.exports = async (client, interaction) => {
 
     const args = [];
     
-    if((interaction.channelId != commandChannel.guildId) && !interaction.member.roles.cache.some(r => r.name == 'Dev')){
+    if((interaction.channelId != commandChannel.id) /*&& !interaction.member.roles.cache.some(r => r.name == 'Dev')*/){
         return await interaction.editReply({ content:"Les commandes pour le bot c'est pas là", ephemeral:true})
     }
 

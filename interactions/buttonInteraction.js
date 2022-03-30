@@ -33,9 +33,37 @@ module.exports = async (client, interaction) => {
                             content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
                         })
                     }
-                    else if ((!roles.some(role => role.name === 'Invité'))&&(user._roles.length > 0)) {
-                        if(roles.some(r => r.name == 'Dev')){
-                            return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
+                    else if ((!roles.some(role => role.name === 'Invité'))&&(user._roles.length > 1)) {
+                        if(roles.some(r => r.name == 'Dev')){//Only for only Dev role case 
+                            if(user._roles.length == 2){
+                                if(!roles.some(r => r.name == 'ServerBooster')){
+                                    return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
+                                    
+                                }
+                                else{
+                                    let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
+                                    await user.roles.add(role);
+                                    await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
+                                    channelAnnoncesInvites.send({
+                                        content: `${interaction.member} vient d'arriver et est désormais un ${role}`
+                                    })
+                                    return 
+                                }
+                            }
+                            else if(user._roles.length > 2){
+                                return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
+
+                            }
+                            else{
+                                let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
+                                await user.roles.add(role);
+                                await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
+                                channelAnnoncesInvites.send({
+                                    content: `${interaction.member} vient d'arriver et est désormais un ${role}`
+                                })
+                                return 
+                            }
+                            
                         }
                         
                         return await interaction.editReply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
@@ -44,7 +72,7 @@ module.exports = async (client, interaction) => {
 
                         let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
                         await user.roles.add(role);
-                        interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
+                        await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
                         channelAnnoncesInvites.send({
                             content: `${interaction.member} vient d'arriver et est désormais un ${role}`
                         })
@@ -60,13 +88,13 @@ module.exports = async (client, interaction) => {
 
                     if ((user._roles.length >= 1 && !isInvite)) {
                         
-                        if(user._roles.length == 1 && !roles.some(r => r.name === 'Server Booster')){
-                            return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
-                        }
-                        else if(user._roles.length > 2 && roles.some(r=>r.name==='Dev')){
+                        
+                        // return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                        
+                        if(user._roles.length > 1 && roles.some(r=>r.name==='Dev')){
                             return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
                         }
-                        else if (roles.some(r => r.name === 'Server Booster')){
+                        else if (user._roles.length == 1 && roles.some(r => r.name === 'Server Booster')){
                             dm = await user.createDM(true)
 
                             const messages = await dm.messages.fetch()
@@ -98,7 +126,7 @@ module.exports = async (client, interaction) => {
                             return await interaction.editReply({content:`Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`})
 
                         }
-                        return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
+                        return await interaction.editReply({ content: `Bien sûr que t'es dans la ${interaction.guild}, ${interaction.member}, t'es en tant que ${interaction.member.roles}`, ephemeral: true })
                         
                         
                     }
@@ -122,7 +150,6 @@ module.exports = async (client, interaction) => {
                                 value: tag
                             }
                             options.push(option)
-                            console.log(name);
                         })
                         const row = new MessageActionRow()
                             .addComponents(

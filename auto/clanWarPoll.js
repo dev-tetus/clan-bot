@@ -6,8 +6,8 @@ const clanWarMembersEmbed = require('../messages/clanWarMembers.js')()
 const DISCORD_EPOCH = 1420070400000
 
 module.exports = async (client) => {
-    const clanWarAnnoncesChannel = await client.channels.fetch('957074488137240587')
-
+    const clanWarAnnoncesChannel = await client.channels.cache.find(ch=>ch.name == 'annonces' && ch.parent.name == '⚔· GDC')
+    console.log(clanWarAnnoncesChannel);
     function convertSnowflakeToDate(snowflake, epoch = DISCORD_EPOCH) {
         const milliseconds = BigInt(snowflake) >> 22n
         return new Date(Number(milliseconds) + epoch)
@@ -20,7 +20,7 @@ module.exports = async (client) => {
             parseInt(response.data.endTime.substr(6, 2))
         )
         const pinnedMessages = await clanWarAnnoncesChannel.messages.fetchPinned()
-        const votesChannel = await client.channels.fetch('958006351580266518')
+        const votesChannel = await client.channels.cache.find(ch=>ch.name == 'votes')
         const messages = await votesChannel.messages.fetch();
 
 

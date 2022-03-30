@@ -13,6 +13,7 @@ client.on("interactionCreate", async (interaction) => {
         
         // Slash Command Handling
         if (interaction.isCommand()) {
+            await interaction.deferReply({ephemeral: true})
             slashCommandInteraction(client, interaction)
         }
         else if (interaction.isButton()) {

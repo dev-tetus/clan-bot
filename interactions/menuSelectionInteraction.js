@@ -7,7 +7,7 @@ module.exports = async (client, interaction) => {
 
     if (interaction.channel.type === 'DM' && interaction.customId === 'player-selection') {
 
-        const channelAnnoncesInvites = await client.channels.fetch('957806378599219250')
+        const channelAnnoncesInvites = await client.channels.cache.find(ch => ch.name =='qui-est-arrivé')
 
         await interaction.editReply(`Okay ${interaction.user}! Presque finis!\nS'il te plaît, rentre le code géneré par le jeux pour la verification du compte Clash of Clans!`)
         let channel = interaction.user.dmChannel;
@@ -19,10 +19,8 @@ module.exports = async (client, interaction) => {
         var user_tag = interaction.values[0].replace('#', '%23')
         var menu = null
         
-        const collector = channel.createMessageCollector({ filter: filter, max:1,idle: 15000});
-        // await collector.on('collect', async (code) => {
-            
-        // })
+        const collector = channel.createMessageCollector({ filter: filter, max:1,idle: 1000 * 30});
+        
         collector.on('end', async (collected,reason) =>{
             
             try {
@@ -32,8 +30,7 @@ module.exports = async (client, interaction) => {
             } catch (error) {
                 console.log(error);
             }
-            console.log('here');
-            console.log(response);
+           
             if (collected.size > 0 && collected.at(0).type != 'REPLY') {
                 if (response != null && response.data.status == 'invalid') {
                     await interaction.followUp(`Désolé ${interaction.user}, mais nous n'avons pas pu vérifier l'authenticité du compte\nLe code n'est pas valide ou n'est pas associé au compte sélectionné (${interaction.values[0]})\nVeuillez essayer à nouveau...`)
@@ -72,19 +69,42 @@ module.exports = async (client, interaction) => {
                         await interaction.followUp(`Félicitations ${interaction.user}! Tu as désormais le rôle '${newRole.name}'`)
                         if (server_member.roles.cache.some(r => r.name === inviteRole.name)) {
                             await server_member.roles.remove(inviteRole);
-                            // channelAnnoncesInvites.send({
+                            channelAnnoncesInvites.send({
                                 
-                            //     content: `${interaction.user} est maintenant ${newRole}!`
-                            // })
+                                content: `${interaction.user} est maintenant ${newRole}!`
+                            })
                         }
                         else {
-                            // channelAnnoncesInvites.send({
-                            //     content: `${interaction.user} vient d'arriver en étant ${newRole}!`
-                            // })
+                            channelAnnoncesInvites.send({
+                                content: `${interaction.user} vient d'arriver en étant ${newRole}!`
+                            })
                         }
                     }    
                 }
             } else {
+                interaction.followUp({content:`Désole ${interaction.user}, veuillez recommencer les étapes depuis le début en t'assurant d'avoir le Jeton à 8 caractères de Clash of Clans`})
+                
+                await new Promise(r => setTimeout(r, 2000)); // == sleep(2)
+                
+                let found = false
+                for(var message of channel.messages.cache){
+                    if(message[1].author.bot){
+                        if((message[1].type !== 'REPLY' )&&(message[1].components[0].components[0].customId == 'player-selection' && !found)){
+                            menu = message[1].components
+                            found = true
+                            await message[1].delete()
+                        }
+                        else if(message[1].type !== 'REPLY'){
+                            await message[1].delete()
+                        }
+                        
+                    }
+                }
+                
+                channel.send({components:menu})
+                    .then((msg) => {console.log(msg);})
+                    .catch((e) =>{console.log(e);})
+                return
                 
             }
             

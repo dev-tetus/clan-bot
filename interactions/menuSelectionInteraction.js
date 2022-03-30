@@ -58,7 +58,7 @@ module.exports = async (client, interaction) => {
                                 await server_member.roles.add(coLeaderRole)
                                 newRole = coLeaderRole
                                 break;
-                            case 'veteran':
+                            case 'admin':
                                 const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
                                 await server_member.roles.add(veteranRole)
                                 newRole = veteranRole

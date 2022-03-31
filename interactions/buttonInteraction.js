@@ -12,7 +12,7 @@ module.exports = async (client, interaction) => {
     var pollMessage = null
 
     for(var msg of pinnedMessages) {
-        if(msg[1].embeds[0].title === '**               ** ⚔ Votation Prochaine GDC ⚔'){
+        if(msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')){
             pollMessage = msg[1]
         }
     }

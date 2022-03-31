@@ -3,7 +3,6 @@ const { MessageEmbed, Message } = require('discord.js');
 module.exports = async (client) => {
     const server = await client.guilds.fetch(process.env.GUILD_ID)
     const channelCommandes = await server.channels.cache.find(r => r.name == 'commandes')
-    console.log(server);
 
     const embedBienvenu = new MessageEmbed()
         .setColor('#c7c7c7')

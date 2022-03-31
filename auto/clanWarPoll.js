@@ -7,7 +7,6 @@ const DISCORD_EPOCH = 1420070400000
 
 module.exports = async (client) => {
     const clanWarAnnoncesChannel = await client.channels.cache.find(ch=>ch.name == 'annonces' && ch.parent.name == '⚔· GDC')
-    console.log(clanWarAnnoncesChannel);
     function convertSnowflakeToDate(snowflake, epoch = DISCORD_EPOCH) {
         const milliseconds = BigInt(snowflake) >> 22n
         return new Date(Number(milliseconds) + epoch)
@@ -26,14 +25,14 @@ module.exports = async (client) => {
 
         for (var msg of pinnedMessages) {
             if (response.data.state !== 'warEnded') {
-                if (msg[1].embeds[0].title === '**               ** ⚔ Votation Prochaine GDC ⚔') {
+                if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
                     await msg[1].delete()
                 }
-                else if (msg[1].embeds[0].title.startsWith('[PHASE')) {
+                else if (msg[1].embeds[0].title.startsWith('[PHASE PRÉPARATION')) {
                     await msg[1].delete()
                 }
             }
-            if (msg[1].embeds[0].title === '**               ** ⚔ Votation Prochaine GDC ⚔') {
+            if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
                 if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
                     console.log('Already a poll...');
                     return

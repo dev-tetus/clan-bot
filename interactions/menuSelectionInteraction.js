@@ -9,7 +9,10 @@ module.exports = async (client, interaction) => {
 
         const channelAnnoncesInvites = await client.channels.cache.find(ch => ch.name =='qui-est-arrivé')
 
-        await interaction.editReply(`Okay ${interaction.user}! Presque finis!\nS'il te plaît, rentre le code géneré par le jeux pour la verification du compte Clash of Clans!`)
+        await interaction.editReply({ 
+            content:`Okay ${interaction.user}! Presque finis!\nS'il te plaît, rentre le code géneré par le jeux pour la verification du compte Clash of Clans! Prends ton temps, au bout de 2 minutes t'auras à nouveau de proposé le menu de sélection de joueur si jamais tu n'as pas eu le temps ;)\nMerci! ;)`,
+            files:['./assets/token.gif']
+        })
         let channel = interaction.user.dmChannel;
 
         const filter = (m) => {
@@ -19,7 +22,7 @@ module.exports = async (client, interaction) => {
         var user_tag = interaction.values[0].replace('#', '%23')
         var menu = null
         
-        const collector = channel.createMessageCollector({ filter: filter, max:1,idle: 1000 * 30});
+        const collector = channel.createMessageCollector({ filter: filter, max:1,idle: 1000 * 120});
         
         collector.on('end', async (collected,reason) =>{
             

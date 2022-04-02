@@ -1,12 +1,22 @@
 const { MessageEmbed } = require('discord.js');
 
-module.exports = () => {
+module.exports = (event) => {
 
     const embed = new MessageEmbed()
         .setColor('#c7c7c7')
-        .setTitle(`Joueurs prochaine GDC`)
         .setDescription(`Liste joueurs recrutés`)
         .setTimestamp()
+
+    switch (event) {
+        case 'GDC':
+            embed.setTitle(`Joueurs prochaine GDC`)
+            break;
+        case 'LDC':
+            embed.setTitle(`Joueurs prochaine LDC`)
+
+        default:
+            break;
+    }
 
     const msg = {
         "embeds": [embed],

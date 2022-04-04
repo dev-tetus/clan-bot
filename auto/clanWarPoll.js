@@ -1,6 +1,7 @@
 require('dotenv').config()
 const axios = require('../axios/axios')
 
+const leagueWarDay = require('../requests/leagueWarDay')
 const clanWarPollEmbed = require('../messages/clanWarPoll.js')
 const clanWarMembersEmbed = require('../messages/clanWarMembers.js')
 const DISCORD_EPOCH = 1420070400000
@@ -26,13 +27,13 @@ module.exports = async (client) => {
                 parseInt(response.data.endTime.substr(6, 2))
             )
         }
-        const pinnedMessages = await clanWarAnnoncesChannel.messages.fetchPinned()
+        const pinnedMessagesAnnoncesGuerre = await clanWarAnnoncesChannel.messages.fetchPinned()
         const votesChannel = await client.channels.cache.find(ch => ch.name == 'votes')
         const messages = await votesChannel.messages.fetch();
 
         const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
 
-        for (var msg of pinnedMessages) {
+        for (var msg of pinnedMessagesAnnoncesGuerre) {
             if (response.data.state !== 'warEnded' || 'notInWar') {
                 if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
                     await msg[1].delete()
@@ -41,7 +42,7 @@ module.exports = async (client) => {
                     await msg[1].delete()
                 }
             }
-            if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) && !(today >= 1 && today <= 5)) {
+            if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) && responseLeague.data.status === 'notInWar') {
                 if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
                     console.log('Already a poll...');
                     return
@@ -54,13 +55,7 @@ module.exports = async (client) => {
         }
         for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
             if (responseLeague.data.state !== 'notInWar') {
-                if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
-                    await msg[1].delete()
-                }
-                else {
-                    console.log('Already a CWL Poll...');
-                    return
-                }
+                await msg[1].delete()
             }
 
             else {
@@ -85,7 +80,7 @@ module.exports = async (client) => {
 
             }
         }
-        else if (response.data.state === 'preparation') {
+        if (response.data.state === 'preparation') {
             console.log('In preparation');
             const message = require('../messages/clanWarPreparation')(response.data)
             await clanWarAnnoncesChannel.send(message)
@@ -93,8 +88,16 @@ module.exports = async (client) => {
             await channelPoll.pin()
             await clanWarAnnoncesChannel.lastMessage.delete()
         }
-        else if (responseLeague.data.state === 'preparation') {
+        if (responseLeague.data.state === 'preparation') {
             const message = require('../messages/clanWarLeaguePreparation')(responseLeague.data)
+            await clanWarLeagueAnnoncesChannel.send(message)
+            const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
+            await channelPoll.pin()
+            await clanWarLeagueAnnoncesChannel.lastMessage.delete()
+
+        }
+        if(responseLeague.data.state === 'inWar'){
+            const message = await require('../requests/leagueWarDay')(clanWarLeagueAnnoncesChannel)
         }
     }
     sendPoll()

@@ -177,13 +177,15 @@ module.exports = async (client) => {
 
     }
 
+    //! CHANNEL BIENVENU
     const channelBienvenu = await client.channels.cache.find(ch => ch.name == '1-bienvenue')
     const messagesBienvenu = await channelBienvenu.messages.fetch()
 
-
+    //! CHANNEL BIENVENU
     const channelDescription = await client.channels.cache.find(ch => ch.name == '2-description')
     const messagesDescription = await channelDescription.messages.fetch()
 
+    //! CHANNEL BIENVENU
     const channelGuideCommandes = await client.channels.cache.find(ch => ch.name == 'guide')
     const messagesGuideCommandes = await channelGuideCommandes.messages.fetch()
 
@@ -193,17 +195,11 @@ module.exports = async (client) => {
     if (messagesDescription.size == 0) {
         await channelDescription.send(msgDescription);
     }
-    else {
-        await channelDescription.lastMessage.delete()
-        await channelDescription.send(msgDescription);
-    }
+
     if (messagesGuideCommandes.size == 0) {
         await channelGuideCommandes.send(msgGuideCommandes);
     }
-    else {
-        await channelGuideCommandes.lastMessage.delete()
-        await channelGuideCommandes.send(msgGuideCommandes);
-    }
+
 
 
 }

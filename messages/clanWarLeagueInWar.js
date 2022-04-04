@@ -16,9 +16,8 @@ module.exports = (data) => {
 
     const embed = new MessageEmbed()
         .setColor('#c7c7c7')
-        .setTitle(`[PHASE GUERRE] **   ** ⚔ LDC **                 ** SN3T ⭐ ${data.stars} - ${data.enemyStars} ⭐ ${data.opponent} ⚔**             **`)
-        .setDescription(`La Ligue de Clans est en cours...\n\n⌛**${days > 0 ? days + ' jour(s) ' : ''}${hours > 0 ? hours + ' heure(s) et ' : ''} ${minutes > 0 || (minutes == 0 && hours > 0) ? minutes + ' minute(s)' : ''}**\n\n⚔ **${data.attacks}/${data.totalAttacks}** attaques\n\n⚔ **${data.enemyAttacks}/${data.totalAttacks}** attaques ennemies`)
-        .setTimestamp()
+        .setTitle(`[PHASE GUERRE]**   ** ⚔ LDC ⚔ \n\n SN3T ⭐ ${data.stars} - ${data.enemyStars} ⭐ ${data.opponent} **             **`)
+        .setDescription(`\n⌛**${days > 0 ? days + ' jour(s) ' : ''}${hours > 0 ? hours + ' heure(s) et ' : ''} ${minutes > 0 || (minutes == 0 && hours > 0) ? minutes + ' minute(s)' : ''}**\n\n⚔ **${data.attacks}/${data.totalAttacks}** attaques\n\n⚔ **${data.enemyAttacks}/${data.totalAttacks}** attaques ennemies`)
 
     const poll = {
         "embeds": [embed]

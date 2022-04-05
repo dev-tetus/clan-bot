@@ -29,19 +29,23 @@ module.exports = async (client) => {
         }
         const pinnedMessagesAnnoncesGuerre = await clanWarAnnoncesChannel.messages.fetchPinned()
         const votesChannel = await client.channels.cache.find(ch => ch.name == 'votes')
-        const messages = await votesChannel.messages.fetch();
 
         const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
+        
+
+        //! Delete all messages from annonces channel to send back again fresh ones
 
         for (var msg of pinnedMessagesAnnoncesGuerre) {
-            if (response.data.state !== 'warEnded' || 'notInWar') {
+            if (response.data.state !== 'warEnded' && response.data.state !== 'notInWar') {
                 if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
                     await msg[1].delete()
+                    await votesChannel.lastMessage.delete()
                 }
                 else if (msg[1].embeds[0].title.startsWith('[PHASE PRÉPARATION')) {
                     await msg[1].delete()
                 }
             }
+            //? No war in progress
             if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) && responseLeague.data.status === 'notInWar') {
                 if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
                     console.log('Already a poll...');
@@ -49,20 +53,23 @@ module.exports = async (client) => {
                 }
 
             }
+            //? War in progress
             else {
                 await msg[1].delete()
             }
         }
-        for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
-            if (responseLeague.data.state !== 'notInWar') {
-                await msg[1].delete()
-            }
 
-            else {
+
+        //! Delete all messages from annonces channel to send back again fresh ones
+
+        for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
                 await msg[1].delete()
-            }
         }
+        
+        //! If no war in progress and no league war 
         if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.state === 'warEnded' || responseLeague.data.state === 'notInWar')) {
+            
+            //! Beginning of month (start of league)
             if ((today >= 1 && today <= 5)) {
                 await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
                 const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
@@ -71,6 +78,7 @@ module.exports = async (client) => {
 
                 await votesChannel.send(clanWarMembersEmbed('LDC'))
             }
+            //! Casual war
             else {
                 await clanWarAnnoncesChannel.send(clanWarPollEmbed('GDC'))
                 const channelPoll = await clanWarAnnoncesChannel.lastMessage
@@ -80,6 +88,7 @@ module.exports = async (client) => {
 
             }
         }
+        //! Casual war preparation phase
         if (response.data.state === 'preparation') {
             console.log('In preparation');
             const message = require('../messages/clanWarPreparation')(response.data)
@@ -88,6 +97,7 @@ module.exports = async (client) => {
             await channelPoll.pin()
             await clanWarAnnoncesChannel.lastMessage.delete()
         }
+        //! League war preparation phase
         if (responseLeague.data.state === 'preparation') {
             const message = require('../messages/clanWarLeaguePreparation')(responseLeague.data)
             await clanWarLeagueAnnoncesChannel.send(message)
@@ -96,8 +106,13 @@ module.exports = async (client) => {
             await clanWarLeagueAnnoncesChannel.lastMessage.delete()
 
         }
+        //! League war in progress
         if(responseLeague.data.state === 'inWar'){
-            const message = await require('../requests/leagueWarDay')(clanWarLeagueAnnoncesChannel)
+            await require('../requests/leagueWarDay')(clanWarLeagueAnnoncesChannel)
+            //? Sleep
+            await new Promise(r => setTimeout(r, 500));
+
+            await require('../requests/leagueWarPreparationNextDay')(clanWarLeagueAnnoncesChannel)
         }
     }
     sendPoll()

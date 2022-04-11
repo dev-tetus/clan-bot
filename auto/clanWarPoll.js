@@ -67,7 +67,7 @@ module.exports = async (client) => {
         }
         
         //! If no war in progress and no league war 
-        if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.state === 'warEnded' || responseLeague.data.state === 'notInWar')) {
+        if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')) {
             
             //! Beginning of month (start of league)
             if ((today >= 1 && today <= 5)) {

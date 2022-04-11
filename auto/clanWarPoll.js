@@ -30,6 +30,8 @@ module.exports = async (client) => {
         const pinnedMessagesAnnoncesGuerre = await clanWarAnnoncesChannel.messages.fetchPinned()
         const votesChannel = await client.channels.cache.find(ch => ch.name == 'votes')
 
+        const votesChannelMessages = await votesChannel.messages.fetch()
+
         const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
         
 
@@ -46,19 +48,20 @@ module.exports = async (client) => {
                 }
             }
             //? No war in progress
-            if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) && responseLeague.data.status === 'notInWar') {
-                if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
-                    console.log('Already a poll...');
-                    return
+            if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') && responseLeague.data.status === 'notInWar') || (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') && responseLeague.data.status === 'ended')) {
+                if(response.data.status != 'ended'){
+                    if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
+                        console.log('Already a poll...');
+                        return
+                    }
                 }
-
+               
             }
             //? War in progress
             else {
                 await msg[1].delete()
             }
         }
-
 
         //! Delete all messages from annonces channel to send back again fresh ones
 
@@ -76,7 +79,16 @@ module.exports = async (client) => {
                 await channelPoll.pin()
                 await clanWarLeagueAnnoncesChannel.lastMessage.delete()
 
-                await votesChannel.send(clanWarMembersEmbed('LDC'))
+                //! Send poll stats message
+                for(var msg of votesChannelMessages){
+                    if(msg[1].embeds[1].description === 'Liste joueurs recrutés'){
+                        console.log('Already poll stats message');
+                        return
+                    }
+                    else{
+                        await votesChannel.send(clanWarMembersEmbed('LDC'))
+                    }
+                }
             }
             //! Casual war
             else {
@@ -84,8 +96,19 @@ module.exports = async (client) => {
                 const channelPoll = await clanWarAnnoncesChannel.lastMessage
                 await channelPoll.pin()
                 await clanWarAnnoncesChannel.lastMessage.delete()
-                await votesChannel.send(clanWarMembersEmbed('GDC'))
+                
 
+                //! Send poll stats message
+                for(var msg of votesChannelMessages){
+                    if(msg[1].embeds[0].description === 'Liste joueurs recrutés'){
+                        console.log('Already poll stats message');
+                        return
+                    }
+                    else{
+                        await votesChannel.send(clanWarMembersEmbed('GDC'))
+                    }
+                }
+                
             }
         }
         //! Casual war preparation phase

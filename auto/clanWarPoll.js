@@ -23,7 +23,7 @@ module.exports = async (client) => {
         try {
             responseLeague = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
         } catch (error) {
-            responseLeague = {reason:'notFound'}
+            responseLeague = {data:{reason:'notFound'}}
         } 
 
         if (response.data.endTime) {
@@ -35,6 +35,7 @@ module.exports = async (client) => {
         const pinnedMessagesAnnoncesGuerre = await clanWarAnnoncesChannel.messages.fetchPinned()
         const votesChannel = await client.channels.cache.find(ch => ch.name == 'votes')
         const votesChannelMessages = await votesChannel.messages.fetch()
+
         console.log(votesChannelMessages.first());
 
         const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
@@ -82,7 +83,7 @@ module.exports = async (client) => {
         }
         
         //! If no war in progress and no league war 
-        if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar' || responseLeague.data.reason === 'notFound')) {
+        if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && ( responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar' )) {
             
             //! Beginning of month (start of league)
             if ((today >= 1 && today <= 5)) {
@@ -102,10 +103,8 @@ module.exports = async (client) => {
                         console.log('Already poll stats message');
                         return
                     }
-                    else{
-                        await votesChannel.send(clanWarMembersEmbed('LDC'))
-                    }
                 }
+                await votesChannel.send(clanWarMembersEmbed('LDC'))
             }
             //! Casual war
             else {
@@ -121,10 +120,8 @@ module.exports = async (client) => {
                         console.log('Already poll stats message');
                         return
                     }
-                    else{
-                        await votesChannel.send(clanWarMembersEmbed('GDC'))
-                    }
                 }
+                await votesChannel.send(clanWarMembersEmbed('GDC'))
                 
             }
         }
@@ -138,7 +135,7 @@ module.exports = async (client) => {
             await clanWarAnnoncesChannel.lastMessage.delete()
         }
         //! League war preparation phase
-        if (responseLeague.reason != 'notFound' && responseLeague.data.state === 'preparation') {
+        if (responseLeague.data.reason != 'notFound' && responseLeague.data.state === 'preparation') {
             const message = require('../messages/clanWarLeaguePreparation')(responseLeague.data)
             await clanWarLeagueAnnoncesChannel.send(message)
             const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
@@ -147,7 +144,7 @@ module.exports = async (client) => {
 
         }
         //! League war in progress
-        if(responseLeague.reason != 'notFound' && responseLeague.data.state === 'inWar'){
+        if(responseLeague.data.reason != 'notFound' && responseLeague.data.state === 'inWar'){
             await require('../requests/leagueWarDay')(clanWarLeagueAnnoncesChannel)
             //? Sleep
             await new Promise(r => setTimeout(r, 500));

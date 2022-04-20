@@ -218,12 +218,8 @@ module.exports = async (client) => {
 
     //! CHANNEL INVITATION-CLAN
     const channelInvitationClan = await client.channels.cache.find(ch => ch.name == 'invitation-clan')
-    // console.log(channelInvitationClan);
     const messagesInvitationClan  = await channelInvitationClan.messages.fetch()
-    for(var msg of messagesInvitationClan){
-        console.log(msg[1].embeds[0]);
-    }
-
+    
     if (messagesBienvenu.size === 0) {
         channelBienvenu.send(msgBienvenu);
     }
@@ -235,7 +231,6 @@ module.exports = async (client) => {
         await channelGuideCommandes.send(msgGuideCommandes);
     }
     if (messagesInvitationClan.size == 0) {
-        console.log('here');
         await channelInvitationClan.send(
             {
                 embeds:msgInvitationClan, 

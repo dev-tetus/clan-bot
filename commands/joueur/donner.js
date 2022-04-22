@@ -1,6 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const axios = require('../../axios/axios');
 
+const messageDonationFunction = require('../../messages/troopDonation')
+
+
+
 const elixirTroops=[
     {name:'barbarian',fr:'Barbares'},
     {name:'archer',fr:'Archers'},
@@ -42,6 +46,39 @@ const spells = [
     {name:'skeletonSpell',fr:'Sorts de squelettes'},
 ]
 
+const machines =[
+    {name:'flameFlinger',fr:'Catapulte d\'esprit'},
+    {name:'siegeBarracks',fr:'Caserne de siège'},
+    {name:'stoneSlammer',fr:'Broyeur de pierres​'},
+    {name:'logLauncher',fr:'Lance-bûches'},
+    {name:'wallWrecker',fr:'Démolisseur'},
+    {name:'battleBlimp',fr:'Dirigeable de combat'},
+]
+
+async function createPrivateChannel(client, interaction){
+    if(interaction.guild.channels.cache.find(channel => channel.name === `🔥 donation-${interaction.member.nickname}`)) {
+        return interaction.followUp({ content:'you already have a ticket, please close your existing ticket first before opening a new one!', ephemeral: true});
+    }
+
+    return interaction.channel.parent.createChannel(`🔥 donation-${interaction.member.nickname}`, {
+        permissionOverwrites: [
+            {
+                id: interaction.user.id,
+                allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+            {
+                id: interaction.guild.roles.everyone,
+                deny: ['VIEW_CHANNEL'],
+            },
+        ],
+        type: 'text',
+    }).then(async channel => {
+        await interaction.followUp({content:`Votre channel temporaire a bien été crée, click ici 👉 ${channel} pour y accéder diréctement`, ephemeral: true});
+        channel.send(`Salut ${interaction.member}, veuillez bien répondre en réagissant au messages envoyés par le bot pour compléter ta demande!`);
+        return channel
+    });
+}
+
 module.exports = {
 
     
@@ -50,16 +87,16 @@ module.exports = {
     type: 'CHAT_INPUT',
     
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ephemeral:false}).catch(() => {});
+        await interaction.deferReply({ephemeral: true }).catch(() => {});
+        const ticketChannel = await createPrivateChannel(client,interaction)
+        const testingChannel = await client.channels.fetch('958725052868739142')
+
 
         const clanMembersResponse = await axios.get(`/clans/${process.env.CLAN_TAG}`)
         
-        const troopSelection = await interaction.followUp({content:`S'il te plaît, choisis le type d'emplacement à donner (Elixir, elixir noir ou/et des sorts)`})
+        const troopSelection = await ticketChannel.send({content:`S'il te plaît, choisis le type d'emplacement à donner (Elixir, elixir noir ou/et des sorts)`})
         var i= 0
 
-        
-
-        
         const filter = (reaction, user) => {
             return user.id === interaction.user.id
         };
@@ -79,16 +116,17 @@ module.exports = {
         var troops = []
         var darktroops = []
         var potions = []
+        var siegeMachines = []
         var selectionCounterTrigger = 0
 
         collector.on('end', async collectedOuter => {
-            console.log(collectedOuter);
 
             await troopSelection.delete()
 
             if((collector.total === 0) || (collector.total === 1 && collectedOuter.first()._emoji.name === 'Checkmark')){
-                console.log('oui');
                 await interaction.followUp({content:`Désolé ${interaction.user} mais aucun type n'a été sélectionné...`});
+                await ticketChannel.delete()
+                
                 return
             }
 
@@ -97,13 +135,16 @@ module.exports = {
                 switch(reaction[1]._emoji.name) {
 
                     case 'elixir':
-                        console.log('elixir selection');
-                        const elixirSelection = await interaction.followUp({content:`S'il te plaît, choisis les troupes à donner`})
-                        let collectorElixir = elixirSelection.createReactionCollector({filter,max:3,time: 60000, idle:10000,dispose:true});
+                        //! Case if it has been removed
+                        if(reaction[1].count === 1){
+                            break;
+                        }
+
+                        const elixirSelection = await ticketChannel.send({content:`S'il te plaît, choisis les troupes à donner`, ephemeral: true})
+                        let collectorElixir = elixirSelection.createReactionCollector({filter,max:20,time: 120000, idle:60000,dispose:true});
                         await collectorElixir.on('collect', (reaction, user) => {
 
                             if(reaction._emoji.name === 'Checkmark'){
-                                console.log('ended selection');
                                 collectorElixir.stop()
                             }
                         });
@@ -112,23 +153,29 @@ module.exports = {
                             if((collectorElixir.total === 0) || (collectorElixir.total === 1 && collected.first()._emoji.name === 'Checkmark')){
                                 await interaction.followUp({content:`Désolé ${interaction.user} mais aucun type n'a été sélectionné...`});
                                 await elixirSelection.delete()
+                                await ticketChannel.delete()
                                 return
                             }
                             selectionCounterTrigger++
                             for(var elixirTroop of collected){
                                 if(elixirTroop[1]._emoji.name!= 'Checkmark'){
                                     let troop = elixirTroops.find(t => t.name === elixirTroop[1]._emoji.name)
-                                    console.log(troop);
                                     troops.push(troop.fr)
+                                    
                                 }
                             }
+                            troops.forEach(t => console.log(t))
                             
+                            await elixirSelection.delete()
                             try {
                                 if ((selectionCounterTrigger === collector.total -1 && (collected.find(t=> t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
-                                    console.log('send message');
+                                    console.log('send message here');
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
 
                                 }
                                 
@@ -138,27 +185,37 @@ module.exports = {
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
                                 }
                             }
 
                         })
-                        for(var troop of elixirTroops){
-                            await elixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == troop.name)}`)
+                        try {
+                            await elixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
+                            for(var troop of elixirTroops){
+                                await elixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == troop.name)}`)
+                            }
+                            
+                        } catch (error) {
+                            break;
                         }
-                        await elixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
+
 
                         break;
 
                     case 'darkElixir':
-                        console.log('darkElixir selection');
-                        const darkElixirSelection = await interaction.followUp({content:`S'il te plaît, choisis les troupes à donner`})
+                        if(reaction[1].count === 1){
+                            break;
+                        }
+                        const darkElixirSelection = await ticketChannel.send({content:`S'il te plaît, choisis les troupes à donner`, ephemeral: true})
 
-                        let collectorDarkElixir = darkElixirSelection.createReactionCollector({filter,max:3,time: 60000, idle:10000,dispose:true});
+                        let collectorDarkElixir = darkElixirSelection.createReactionCollector({filter,max:20,time: 120000, idle:60000,dispose:true});
 
                         await collectorDarkElixir.on('collect', (reaction, user) => {
 
                             if(reaction._emoji.name === 'Checkmark'){
-                                console.log('ended selection');
                                 collectorDarkElixir.stop()
                             }
                         });
@@ -167,6 +224,7 @@ module.exports = {
                             if((collectorDarkElixir.total === 0) || (collectorDarkElixir.total === 1 && collected.first()._emoji.name === 'Checkmark')){
                                 await interaction.followUp({content:`Désolé ${interaction.user} mais aucun type n'a été sélectionné...`});
                                 await darkElixirSelection.delete()
+                                await ticketChannel.delete()
                                 return
                             }
                             selectionCounterTrigger++
@@ -177,12 +235,17 @@ module.exports = {
                                     darktroops.push(troop.fr)
                                 }
                             }
+
+                            await darkElixirSelection.delete()
                             try {
                                 if ((selectionCounterTrigger === collector.total -1 && (collected.find(t=> t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
                                     console.log('send message');
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
                                 }
                                 
                             } catch (error) {
@@ -191,19 +254,30 @@ module.exports = {
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
                                 }
                             }
                         })
-                        for(var troop of darkTroops){
-                            await darkElixirSelection.react(`${await client.emojis.cache.find(emoji => emoji.name == troop.name)}`)
+                        try {
+                            await darkElixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
+                            for(var troop of darkTroops){
+                                await darkElixirSelection.react(`${await client.emojis.cache.find(emoji => emoji.name == troop.name)}`)
+                            }
+                            
+                        } catch (error) {
+                            break;
                         }
-                        await darkElixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
 
                         break;
                         
                     case 'potion':
-                        const potionSelection = await interaction.followUp({content:`S'il te plaît, choisis les sorts à donner`})
-                        let collectorPotion = potionSelection.createReactionCollector({filter,max:3,time: 60000, idle:10000,dispose:true});
+                        if(reaction[1].count === 1){
+                            break;
+                        }
+                        const potionSelection = await ticketChannel.send({content:`S'il te plaît, choisis les sorts à donner`, ephemeral: true})
+                        let collectorPotion = potionSelection.createReactionCollector({filter,max:20,time: 120000, idle:60000,dispose:true});
 
                         await collectorPotion.on('collect', (reaction, user) => {
                             if(reaction._emoji.name === 'Checkmark'){
@@ -216,6 +290,7 @@ module.exports = {
                             if((collectorPotion.total === 0) || (collectorPotion.total === 1 && collected.first()._emoji.name === 'Checkmark')){
                                 await interaction.followUp({content:`Désolé ${interaction.user} mais aucun type n'a été sélectionné...`});
                                 await potionSelection.delete()
+                                await ticketChannel.delete()
                                 return
                             }
                             selectionCounterTrigger++
@@ -225,12 +300,17 @@ module.exports = {
                                     potions.push(troop.fr)
                                 }
                             }
+                            await potionSelection.delete()
                             try {
                                 if ((selectionCounterTrigger === collector.total -1 && (collected.find(t=> t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
-                                    console.log('send message');
+                                    console.log('send message potions');
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    console.log(messageToSend);
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
                                 }
                                 
                             } catch (error) {
@@ -239,17 +319,92 @@ module.exports = {
                                     console.log(troops);
                                     console.log(darktroops);
                                     console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
                                 }
                             }
 
                         })
-                        for(var spell of spells){
-                            await potionSelection.react(`${client.emojis.cache.find(emoji => emoji.name == spell.name)}`)
+                        try {
+                            await potionSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
+                            for(var spell of spells){
+                                await potionSelection.react(`${client.emojis.cache.find(emoji => emoji.name == spell.name)}`)
+                            }
+                            
+                        } catch (error) {
+                            break
                         }
-                        await potionSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
 
                         break;
-                    default:
+                    
+                    case 'workshop':
+                        if(reaction[1].count === 1){
+                            break;
+                        }
+                        const workshopSelection = await ticketChannel.send({content:`S'il te plaît, choisis les engins de siège à donner`, ephemeral: true})
+                        let collectorWorkshop = workshopSelection.createReactionCollector({filter,max:20,time: 120000, idle:60000,dispose:true});
+
+                        await collectorWorkshop.on('collect', (reaction, user) => {
+                            if(reaction._emoji.name === 'Checkmark'){
+                                console.log('ended selection');
+                                collectorWorkshop.stop()
+                            }
+                        });
+
+                        await collectorWorkshop.on('end', async collected =>{
+                            if((collectorWorkshop.total === 0) || (collectorWorkshop.total === 1 && collected.first()._emoji.name === 'Checkmark')){
+                                await interaction.followUp({content:`Désolé ${interaction.user} mais aucun type n'a été sélectionné...`});
+                                await workshopSelection.delete()
+                                await ticketChannel.delete()
+                                return
+                            }
+                            selectionCounterTrigger++
+                            for(var machine of collected){
+                                if(machine[1]._emoji.name != 'Checkmark'){
+                                    let troop = machines.find(t => t.name === machine[1]._emoji.name)
+                                    siegeMachines.push(troop.fr)
+                                }
+                            }
+                            await workshopSelection.delete()
+                            try {
+                                if ((selectionCounterTrigger === collector.total -1 && (collected.find(t=> t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
+                                    console.log('send message potions');
+                                    console.log(troops);
+                                    console.log(darktroops);
+                                    console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    console.log(messageToSend);
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
+                                }
+                                
+                            } catch (error) {
+                                if(selectionCounterTrigger === collector.total){
+                                    console.log('send message');
+                                    console.log(troops);
+                                    console.log(darktroops);
+                                    console.log(potions);
+                                    messageToSend = require('../../messages/troopDonation')({player: interaction.member.nickname,troops,darktroops,potions,siegeMachines})
+                                    await testingChannel.send(messageToSend)
+                                    await ticketChannel.delete()
+                                }
+                            }
+
+                        })
+                        try {
+                            await workshopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
+                            for(var machine of machines){
+                                await workshopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == machine.name)}`)
+                            }
+                            
+                        } catch (error) {
+                            break
+                        }
+
+                        break;
+                        
+                        default:
                         break;
                 }
             }
@@ -258,11 +413,8 @@ module.exports = {
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'elixir')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'darkElixir')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'potion')}`)
+        await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'workshop')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
-        
-        console.log(troops);
-        console.log(darktroops);
-        console.log(potions);
 
     },  
 };

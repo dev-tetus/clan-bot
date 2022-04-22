@@ -8,7 +8,7 @@ module.exports = async (client, interaction) => {
     const args = [];
     
     if((interaction.channelId != commandChannel.id) /*&& !interaction.member.roles.cache.some(r => r.name == 'Dev')*/){
-        return await interaction.editReply({ content:"Les commandes pour le bot c'est pas là", ephemeral:true})
+        return await interaction.reply({ content:"*Les commandes pour le bot ce n'est pas ici*", ephemeral:true})
     }
 
     for (let option of interaction.options.data) {

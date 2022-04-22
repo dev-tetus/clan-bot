@@ -36,7 +36,6 @@ module.exports = async (client) => {
         const votesChannel = await client.channels.cache.find(ch => ch.name == 'votes')
         const votesChannelMessages = await votesChannel.messages.fetch()
 
-        console.log(votesChannelMessages.first());
 
         const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
         

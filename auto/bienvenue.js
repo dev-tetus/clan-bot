@@ -88,7 +88,7 @@ module.exports = async (client) => {
         "embeds": [new MessageEmbed({
             "title": "**                                  **👨‍💻 DESCRIPTION COMMANDES 👩‍💻",
             "color": 9765892,
-            "description": `Afin de faciliter la gestion du clan et du serveur nous avons développé notre petit ${client.user}, il est très jeune donc très fragile, soyez sympa avec.\n\n${client.user} nous permettra d'automatiser des tâches en fonction de la situation du clan comme envoyer des rappels de temps restant de GDC, de pourcentage de destruction...\n\nIl organisera des votes en fonction de la situation du clan afin de savoir qui est prêt à s'engager à participer dans l'évènement à venir\n\n⚠️ __RAPPEL! Ces commandes seront que utilisables dans le channel ${channelCommandes}__\n\n\n*En cours de développement*\n\n`,
+            "description": `Afin de faciliter la gestion du clan et du serveur nous avons développé notre petit ${client.user}, il est très jeune donc très fragile, soyez sympa avec.\n\n${client.user} nous permettra d'automatiser des tâches en fonction de la situation du clan comme envoyer des rappels de temps restant de GDC, de pourcentage de destruction...\n\nIl organisera des votes en fonction de la situation du clan afin de savoir qui est prêt à s'engager à participer dans l'évènement à venir\n\n⚠️ __RAPPEL! Ces commandes seront que utilisables dans le channel ${channelCommandes}__\n\n\n\n\n`,
             "timestamp": "",
             "author": {
                 "name": ""
@@ -113,7 +113,7 @@ module.exports = async (client) => {
                     inline: true
                 },
                 {
-                    "name": "/donnations",
+                    "name": "/donations",
                     "value": '\u200B',
                     "inline": true
                 },
@@ -128,12 +128,27 @@ module.exports = async (client) => {
                     inline: true
                 },
                 {
+                    "name": "/donations <@joueur>",
+                    "value": '\u200B',
+                    "inline": true
+                },
+                {
+                    "name": "Affiche la moyenne de dons du joueur demandé pendant la période actuelle ",
+                    "value": '\u200B',
+                    "inline": true
+                },
+                {
+                    name: '\u200B',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
                     name: '/recevoir',
                     value: '\u200B',
                     inline: true
                 },
                 {
-                    name: `Envoie un message dans un *besoin-de-troupes* après avoir répondu les différentes questions de __${client.user.username}__ à propos de ta demande`,
+                    name: `Envoie un message après avoir répondu les différentes questions de __${client.user.username}__ à propos de ta demande`,
                     value: '\u200B',
                     inline: true
                 },
@@ -148,7 +163,22 @@ module.exports = async (client) => {
                     inline: true
                 },
                 {
-                    name: `Envoie un message dans un *besoin-de-troupes* après avoir répondu les différentes questions de __${client.user.username}__ à propos de ton offre.`,
+                    name: `Envoie un message après avoir répondu les différentes questions de __${client.user.username}__ à propos de ton offre.`,
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
+                    value: '*En cours de développement*',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
                     value: '\u200B',
                     inline: true
                 },

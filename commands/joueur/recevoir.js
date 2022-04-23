@@ -119,12 +119,11 @@ module.exports = {
 
 
         const troopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis le type d'emplacement à demander (Elixir, Elixir Noir, Sorts et/ou Engins de Siège)` })
-        var i = 0
 
         const filter = (reaction, user) => {
             return user.id === interaction.user.id
         };
-        let collector = troopSelection.createReactionCollector({ filter, max: 4, time: 60000, idle: 10000, dispose: true });
+        let collector = troopSelection.createReactionCollector({ filter, max: 5, time: 60000, idle: 10000, dispose: true });
         collector.on('remove', (reaction, user) => {
             console.log('removed');
         });
@@ -410,11 +409,11 @@ module.exports = {
             }
 
         });
+        await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'elixir')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'darkElixir')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'potion')}`)
         await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'workshop')}`)
-        await troopSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
 
     },
 };

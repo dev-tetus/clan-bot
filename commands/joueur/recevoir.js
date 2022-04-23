@@ -1,7 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const axios = require('../../axios/axios');
-
-const messageDonationFunction = require('../../messages/troopDonation')
+const { MessageActionRow, MessageButton } = require('discord.js');
 
 
 
@@ -56,11 +54,11 @@ const machines = [
 ]
 
 async function createPrivateChannel(client, interaction) {
-    if (interaction.guild.channels.cache.find(channel => channel.name === `🔥 donation-${interaction.member.nickname}`)) {
+    if (interaction.guild.channels.cache.find(channel => channel.name === `🔥 demande-${interaction.member.nickname}`)) {
         return interaction.followUp({ content: 'you already have a ticket, please close your existing ticket first before opening a new one!', ephemeral: true });
     }
 
-    return interaction.channel.parent.createChannel(`🔥 donation-${interaction.member.nickname}`, {
+    return interaction.channel.parent.createChannel(`🔥 demande-${interaction.member.nickname}`, {
         permissionOverwrites: [
             {
                 id: interaction.user.id,
@@ -82,8 +80,8 @@ async function createPrivateChannel(client, interaction) {
 module.exports = {
 
 
-    name: "donner",
-    description: "Envoie une annonce pour tout le monde avec les troupes a donner",
+    name: "recevoir",
+    description: "Envoie une annonce pour tout le monde avec les troupes demandées",
     type: 'CHAT_INPUT',
 
     run: async (client, interaction, args) => {
@@ -92,9 +90,35 @@ module.exports = {
         const chatChannel = await client.channels.cache.find(channel => channel.name === 'chat')
 
 
-        const clanMembersResponse = await axios.get(`/clans/${process.env.CLAN_TAG}`)
+        //! To implement with emojis
+        //Ask whether is CWL or Clan games or nornal war
+        // const rowButtons = new MessageActionRow()
+        //     .addComponents([
+        //         new MessageButton()
+        //             .setCustomId('1')
+        //             .setLabel('Matchmaking')
+        //             .setStyle('PRIMARY'),
+        //         new MessageButton()
+        //             .setCustomId('2')
+        //             .setLabel('GDC')
+        //             .setStyle('PRIMARY'),
+        //         new MessageButton()
+        //             .setCustomId('3')
+        //             .setLabel('JDC')
+        //             .setStyle('PRIMARY'),
+        //         new MessageButton()
+        //             .setCustomId('4')
+        //             .setLabel('LDC')
+        //             .setStyle('PRIMARY'),
+        //     ]
+        //     );
+        // await ticketChannel.send({
+        //     content: "Choisis le type d'événement pour ta demande",
+        //     components: [rowButtons]
+        // })
 
-        const troopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis le type d'emplacement à donner (Elixir, elixir noir ou/et des sorts)` })
+
+        const troopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis le type d'emplacement à demander (Elixir, Elixir Noir, Sorts et/ou Engins de Siège)` })
         var i = 0
 
         const filter = (reaction, user) => {
@@ -140,7 +164,7 @@ module.exports = {
                             break;
                         }
 
-                        const elixirSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les troupes à donner`, ephemeral: true })
+                        const elixirSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les troupes à demander`, ephemeral: true })
                         let collectorElixir = elixirSelection.createReactionCollector({ filter, max: 20, time: 120000, idle: 60000, dispose: true });
                         await collectorElixir.on('collect', (reaction, user) => {
 
@@ -170,7 +194,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
 
@@ -179,7 +203,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -203,7 +227,7 @@ module.exports = {
                         if (reaction[1].count === 1) {
                             break;
                         }
-                        const darkElixirSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les troupes à donner`, ephemeral: true })
+                        const darkElixirSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les troupes à demander`, ephemeral: true })
 
                         let collectorDarkElixir = darkElixirSelection.createReactionCollector({ filter, max: 20, time: 120000, idle: 60000, dispose: true });
 
@@ -225,6 +249,7 @@ module.exports = {
                             for (var elixirTroop of collected) {
                                 if (elixirTroop[1]._emoji.name != 'Checkmark') {
                                     let troop = darkTroops.find(t => t.name === elixirTroop[1]._emoji.name)
+                                    console.log(troop);
                                     darktroops.push(troop)
                                 }
                             }
@@ -233,7 +258,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -241,7 +266,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -263,7 +288,7 @@ module.exports = {
                         if (reaction[1].count === 1) {
                             break;
                         }
-                        const potionSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les sorts à donner`, ephemeral: true })
+                        const potionSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les sorts à demander`, ephemeral: true })
                         let collectorPotion = potionSelection.createReactionCollector({ filter, max: 20, time: 120000, idle: 60000, dispose: true });
 
                         await collectorPotion.on('collect', (reaction, user) => {
@@ -291,7 +316,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     console.log(messageToSend);
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
@@ -300,7 +325,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -323,7 +348,7 @@ module.exports = {
                         if (reaction[1].count === 1) {
                             break;
                         }
-                        const workshopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les engins de siège à donner`, ephemeral: true })
+                        const workshopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis les engins de siège à demander`, ephemeral: true })
                         let collectorWorkshop = workshopSelection.createReactionCollector({ filter, max: 20, time: 120000, idle: 60000, dispose: true });
 
                         await collectorWorkshop.on('collect', (reaction, user) => {
@@ -351,7 +376,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     console.log(messageToSend);
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
@@ -360,7 +385,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopDonation')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }

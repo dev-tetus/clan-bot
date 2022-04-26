@@ -38,7 +38,7 @@ module.exports = async (client) => {
 
         //! COMMANDS DELETE
         // client.application.commands.set([])
-        // await client.guilds.cache.get(process.env.GUILD_ID).commands.set([])
+        await client.guilds.cache.get(process.env.GUILD_ID).commands.set([])
         
 
     });

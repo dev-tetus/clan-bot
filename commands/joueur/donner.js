@@ -122,7 +122,7 @@ module.exports = {
             await troopSelection.delete()
 
             if ((collector.total === 0) || (collector.total === 1 && collectedOuter.first()._emoji.name === 'Checkmark')) {
-                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...` });
+                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...`,ephemeral: true});
                 await ticketChannel.delete()
 
                 return
@@ -149,7 +149,7 @@ module.exports = {
 
                         await collectorElixir.on('end', async collected => {
                             if ((collectorElixir.total === 0) || (collectorElixir.total === 1 && collected.first()._emoji.name === 'Checkmark')) {
-                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...` });
+                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...`,ephemeral: true});
                                 await elixirSelection.delete()
                                 await ticketChannel.delete()
                                 return
@@ -214,7 +214,7 @@ module.exports = {
 
                         await collectorDarkElixir.on('end', async collected => {
                             if ((collectorDarkElixir.total === 0) || (collectorDarkElixir.total === 1 && collected.first()._emoji.name === 'Checkmark')) {
-                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...` });
+                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...`,ephemeral: true});
                                 await darkElixirSelection.delete()
                                 await ticketChannel.delete()
                                 return
@@ -273,7 +273,7 @@ module.exports = {
 
                         await collectorPotion.on('end', async collected => {
                             if ((collectorPotion.total === 0) || (collectorPotion.total === 1 && collected.first()._emoji.name === 'Checkmark')) {
-                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...` });
+                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...`,ephemeral: true});
                                 await potionSelection.delete()
                                 await ticketChannel.delete()
                                 return
@@ -333,7 +333,7 @@ module.exports = {
 
                         await collectorWorkshop.on('end', async collected => {
                             if ((collectorWorkshop.total === 0) || (collectorWorkshop.total === 1 && collected.first()._emoji.name === 'Checkmark')) {
-                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...` });
+                                await interaction.followUp({ content: `Désolé ${interaction.user} mais aucun type n'a été sélectionné...`,ephemeral: true});
                                 await workshopSelection.delete()
                                 await ticketChannel.delete()
                                 return

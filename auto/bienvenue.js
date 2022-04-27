@@ -173,6 +173,21 @@ module.exports = async (client) => {
                     inline: true
                 },
                 {
+                    name: '/actualiser',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: `Met à jour le profil Discord du joueur`,
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
                     name: '\u200B',
                     value: '*En cours de développement*',
                     inline: true

@@ -11,26 +11,48 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true }).catch(() => { });
         const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
 
-        var options = []
-
+        var options1 = []
+        var options2 = []
+        let count = 0;
         player_tags.data.items.forEach(player => {
             let { tag, name, role } = player
-            let option = {
-                label: name,
-                value: tag
+            if (count < 25) {
+                count++
+                let option = {
+                    label: name,
+                    value: tag
+                }
+                options1.push(option)
             }
-            options.push(option)
-        })
+            else {
+                let option = {
+                    label: name,
+                    value: tag
+                }
+                options2.push(option)
+            }
 
-        const row = new MessageActionRow()
+        })
+        let row = new MessageActionRow()
             .addComponents(
                 new MessageSelectMenu()
                     .setCustomId('player-selection')
                     .setPlaceholder('Sélectionnez votre nom')
-                    .addOptions(options),
+                    .addOptions(options1),
             );
 
-        return await interaction.followUp({ content: "Choisis ton profile", components: [row], ephemeral: true})
+            
+            
+        let row2 = new MessageActionRow()
+            .addComponents(
+                new MessageSelectMenu()
+                    .setCustomId('player-selection-2')
+                    .setPlaceholder('Sélectionnez votre nom')
+                    .addOptions(options2),
+            );
+        await interaction.followUp({ content: "Choisis ton profile", components: [row,row2], ephemeral: true})
+        // return await interaction.followUp({components: [row], ephemeral: true})
+
     }
 
 }

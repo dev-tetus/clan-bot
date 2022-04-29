@@ -33,6 +33,7 @@ module.exports = async (client, interaction) => {
                 const user = interaction.member
                 let roles = interaction.member.roles.cache
 
+                //? As a guest
                 if (interaction.customId === '0') {
 
                     if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
@@ -87,6 +88,7 @@ module.exports = async (client, interaction) => {
                     }
 
                 }
+                //? As a member
                 else {
 
                     let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
@@ -115,12 +117,13 @@ module.exports = async (client, interaction) => {
                                     }
                                 }
                             }
+                            //! Limit of 25 options to choose for menu selection
                             var options1 = []
                             var options2 = []
-                            count == 0;
+                            let count = 0;
                             player_tags.data.items.forEach(player => {
                                 let { tag, name, role } = player
-                                if (count <= 25) {
+                                if (count < 25) {
                                     count++
                                     let option = {
                                         label: name,
@@ -142,7 +145,7 @@ module.exports = async (client, interaction) => {
                                     new MessageSelectMenu()
                                         .setCustomId('player-selection')
                                         .setPlaceholder('Sélectionnez votre nom')
-                                        .addOptions(options),
+                                        .addOptions(options1),
                                 );
                             dm.send({ components: [row] })
 

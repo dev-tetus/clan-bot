@@ -1,11 +1,16 @@
 require('dotenv').config()
 const axios = require('../axios/axios')
+const schedule = require('node-schedule')
 
 const leagueWarDay = require('../requests/leagueWarDay')
 const clanWarPollEmbed = require('../messages/clanWarPoll.js')
 const clanWarMembersEmbed = require('../messages/clanWarMembers.js')
 const DISCORD_EPOCH = 1420070400000
 
+const rule = new schedule.RecurrenceRule()
+rule.hour = [8,12,19]
+rule.minute = '00'
+rule.tz = 'Europe/Madrid'
 
 module.exports = async (client) => {
     const today = new Date().getDate()
@@ -100,6 +105,7 @@ module.exports = async (client) => {
                 for(var msg of votesChannelMessages){
                     if(msg[1].embeds[1].description === 'Liste joueurs recrutés'){
                         console.log('Already poll stats message');
+                        getNextAnnouncementDate(schedule)
                         return
                     }
                 }
@@ -117,6 +123,7 @@ module.exports = async (client) => {
                 for(var msg of votesChannelMessages){
                     if(msg[1].embeds[0].description === 'Liste joueurs recrutés'){
                         console.log('Already poll stats message');
+                        getNextAnnouncementDate(schedule)
                         return
                     }
                 }
@@ -151,6 +158,11 @@ module.exports = async (client) => {
             await require('../requests/leagueWarPreparationNextDay')(clanWarLeagueAnnoncesChannel)
         }
     }
-    sendPoll()
-    setInterval(sendPoll, 1000 * 60 * 60)
+    const job = schedule.scheduleJob(rule, sendPoll)
+
+    function getNextAnnouncementDate(schedule){
+        jobTimeData= schedule.scheduledJobs[Object.keys(schedule.scheduledJobs)[0]].nextInvocation()._date.c
+        invocationDate = jobTimeData.day + '-' + jobTimeData.month + '-' + jobTimeData.year +" "+jobTimeData.hour+":"+jobTimeData.minute
+        console.log('Next announcement scheduled at: ' + invocationDate);
+    }
 }

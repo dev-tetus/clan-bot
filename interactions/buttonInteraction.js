@@ -37,7 +37,7 @@ module.exports = async (client, interaction) => {
 
                     if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
 
-                        interaction.reply({
+                        interaction.editReply({
                             content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
                         })
                     }
@@ -95,6 +95,7 @@ module.exports = async (client, interaction) => {
 
 
                     if ((user._roles.length >= 1 && !isInvite)) {
+                        console.log('has role');
 
 
                         // return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
@@ -114,16 +115,29 @@ module.exports = async (client, interaction) => {
                                     }
                                 }
                             }
-                            var options = []
+                            var options1 = []
+                            var options2 = []
+                            count == 0;
                             player_tags.data.items.forEach(player => {
                                 let { tag, name, role } = player
-                                let option = {
-                                    label: name,
-                                    value: tag
+                                if (count <= 25) {
+                                    count++
+                                    let option = {
+                                        label: name,
+                                        value: tag
+                                    }
+                                    options1.push(option)
                                 }
-                                options.push(option)
+                                else {
+                                    let option = {
+                                        label: name,
+                                        value: tag
+                                    }
+                                    options2.push(option)
+                                }
+
                             })
-                            const row = new MessageActionRow()
+                            let row = new MessageActionRow()
                                 .addComponents(
                                     new MessageSelectMenu()
                                         .setCustomId('player-selection')
@@ -131,7 +145,17 @@ module.exports = async (client, interaction) => {
                                         .addOptions(options),
                                 );
                             dm.send({ components: [row] })
-                            return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
+
+                            row = new MessageActionRow()
+                                .addComponents(
+                                    new MessageSelectMenu()
+                                        .setCustomId('player-selection')
+                                        .setPlaceholder('Sélectionnez votre nom')
+                                        .addOptions(options2),
+                                );
+
+                            dm.send({ components: [row] })
+                            return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`, ephemeral: true })
 
                         }
                         return await interaction.editReply({ content: `Bien sûr que t'es dans la ${interaction.guild}, ${interaction.member}, t'es en tant que ${interaction.member.roles}`, ephemeral: true })
@@ -141,7 +165,9 @@ module.exports = async (client, interaction) => {
                     else {
                         dm = await user.createDM(true)
 
+
                         const messages = await dm.messages.fetch()
+                        console.log('here');
                         if (messages.size > 0) {
 
                             for (const message of messages) {
@@ -150,32 +176,59 @@ module.exports = async (client, interaction) => {
                                 }
                             }
                         }
-                        var options = []
+                        var options1 = []
+                        var options2 = []
+                        let count = 0;
                         player_tags.data.items.forEach(player => {
                             let { tag, name, role } = player
-                            let option = {
-                                label: name,
-                                value: tag
+                            if (count < 25) {
+                                count++
+                                let option = {
+                                    label: name,
+                                    value: tag
+                                }
+                                options1.push(option)
                             }
-                            options.push(option)
+                            else {
+                                let option = {
+                                    label: name,
+                                    value: tag
+                                }
+                                options2.push(option)
+                            }
+
                         })
-                        const row = new MessageActionRow()
+                        let row = new MessageActionRow()
                             .addComponents(
                                 new MessageSelectMenu()
                                     .setCustomId('player-selection')
                                     .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options),
+                                    .addOptions(options1),
                             );
+
+                        console.log('here');
                         dm.send({ components: [row] })
-                        return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
+
+                        row = new MessageActionRow()
+                            .addComponents(
+                                new MessageSelectMenu()
+                                    .setCustomId('player-selection')
+                                    .setPlaceholder('Sélectionnez votre nom')
+                                    .addOptions(options2),
+                            );
+
+                        dm.send({ components: [row] })
+                        return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
+                        return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
 
                     }
                 }
             } catch (e) {
                 if (e.name == 'DiscordAPIError') {
-                    console.log(error);
+                    console.log(e);
                 }
-                return interaction.reply({ content: `Désolé ${interaction.member}, je n'ai pas pu éxecuter ta demande`, ephemeral: true })
+                console.log(e);
+                return interaction.editReply({ content: `Désolé ${interaction.member}, je n'ai pas pu éxecuter ta demande` })
 
             }
             break;

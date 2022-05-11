@@ -14,17 +14,26 @@ rule.tz = 'Europe/Madrid'
 
 
 
+
 function getNextAnnouncementDate(schedule){
     jobTimeData= schedule.scheduledJobs[Object.keys(schedule.scheduledJobs)[0]].nextInvocation()._date.c
     invocationDate = jobTimeData.day + '-' + jobTimeData.month + '-' + jobTimeData.year +" "+jobTimeData.hour+":"+jobTimeData.minute
-    console.log('Next announcement scheduled at: ' + invocationDate);
+    return console.log('Next announcement scheduled at: ' + invocationDate);
+    
 }
+
 async function sendPoll(client) {
     const today = new Date().getDate()
     const clanWarAnnoncesChannel = await client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· GDC')
     const clanWarLeagueAnnoncesChannel = await client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· LDC')
-    const response = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar`)
+    
     var responseLeague = null
+    var response = null
+    try {
+        response = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar`)
+    } catch (error) {
+        response = {data:{state:'notFound'}}
+    } 
 
     try {
         responseLeague = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
@@ -89,7 +98,6 @@ async function sendPoll(client) {
     
     //! If no war in progress and no league war 
     if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && ( responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar' )) {
-        
         //! Beginning of month (start of league)
         if ((today >= 1 && today <= 5)) {
             await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
@@ -122,11 +130,15 @@ async function sendPoll(client) {
 
             //! Send poll stats message
             for(var msg of votesChannelMessages){
+                if(response.data.state === 'notFound'){
+                    await msg[1].delete()
+                }
                 if(msg[1].embeds[0].description === 'Liste joueurs recrutés'){
                     console.log('Already poll stats message');
                     getNextAnnouncementDate(schedule)
                     return
                 }
+                
             }
             await votesChannel.send(clanWarMembersEmbed('GDC'))
             
@@ -160,6 +172,10 @@ async function sendPoll(client) {
     }
 }
 
+function scheduleJobAtTime(rule){
+    schedule.scheduleJob(rule, sendPoll)
+    return getNextAnnouncementDate(schedule)
+}
 async function sendPollLogic(client){
 
 
@@ -173,5 +189,6 @@ async function sendPollLogic(client){
 }
 module.exports ={
     sendPollLogic,
-    sendPoll
+    sendPoll,
+    scheduleJobAtTime
 }

@@ -12,12 +12,12 @@ async function assignRole(newRole, discordMember, currentRoleName, guild) {
     for (var role of discordMember._roles) {
         role = guild.roles.resolve(role);
 
-        if (role.name != currentRoleName && role.name != 'Server Booster') {
+        if (role.name != currentRoleName && role.name != 'Server Booster' && role.name != 'Membre Fondateur' && role.name != 'Dev') {
             await discordMember.roles.remove(role)
             await discordMember.roles.add(newRole)
             return console.log(`New role assigned to ${discordMember.nickname} as ${newRole}`);
         }
-        else return console.log('Already with role');
+        else return console.log(`Already with role ${role.name}`);
     }
 }
 async function updateNickname(discordMember, member) {

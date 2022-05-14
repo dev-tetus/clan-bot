@@ -4,3 +4,7 @@
 
 
 .env
+
+
+#IDE plugins data
+.vscode*

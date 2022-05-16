@@ -1,10 +1,10 @@
-const { MessageAttachment,MessageEmbed, Message } = require('discord.js');
+const { MessageAttachment, MessageEmbed, Message } = require('discord.js');
 
 module.exports = async (client) => {
     const server = await client.guilds.fetch(process.env.GUILD_ID)
     const channelCommandes = await server.channels.cache.find(r => r.name == 'commandes')
     const channelChat = await server.channels.cache.find(r => r.name == 'chat')
-    const roleChefAdjoint = await server.roles.cache.find(r=>r.name == 'Chef Adjoint')
+    const roleChefAdjoint = await server.roles.cache.find(r => r.name == 'Chef Adjoint')
 
     const embedBienvenu = new MessageEmbed()
         .setColor('#c7c7c7')
@@ -188,6 +188,36 @@ module.exports = async (client) => {
                     inline: true
                 },
                 {
+                    name: '/points',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: 'Affiche le nombre de trophées actuels du clan',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '/points <@joueur>',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: 'Affiche le nombre de trophées actuels du joueur',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
+                    name: '\u200B',
+                    value: '\u200B',
+                    inline: true
+                },
+                {
                     name: '\u200B',
                     value: '*En cours de développement*',
                     inline: true
@@ -202,21 +232,7 @@ module.exports = async (client) => {
                     value: '\u200B',
                     inline: true
                 },
-                {
-                    name: '/points',
-                    value: '\u200B',
-                    inline: true
-                },
-                {
-                    name: 'Affiche le nombre de trophées total actuel dans le clan',
-                    value: '\u200B',
-                    inline: true
-                },
-                {
-                    name: '\u200B',
-                    value: '\u200B',
-                    inline: true
-                },
+
 
 
             ]
@@ -226,28 +242,28 @@ module.exports = async (client) => {
 
     const file = new MessageAttachment('./assets/Logo.png');
     const msgInvitationClan = [new MessageEmbed({
-            "title": "**                                       **✨ INVITATION CLAN ✨",
-            "color": 9765892,
-            "description": `Afin de nous rejoindre, nous vous laissons le lien d'invitation du clan, si vous avez des questions n'hésitez pas a nous les poser dans ${channelChat}!`,
-            "image": {},
-            "thumbnail": {
-                "url":"attachment://Logo.png",
+        "title": "**                                       **✨ INVITATION CLAN ✨",
+        "color": 9765892,
+        "description": `Afin de nous rejoindre, nous vous laissons le lien d'invitation du clan, si vous avez des questions n'hésitez pas a nous les poser dans ${channelChat}!`,
+        "image": {},
+        "thumbnail": {
+            "url": "attachment://Logo.png",
+        },
+        "fields": [
+            {
+                "name": `\u200B`,
+                "value": `*Nous nous réservons le droit de refuser les demandes si nous le considérons, pour toute autre question, dirigez vous vers les ${roleChefAdjoint}*`,
+                "inline": false
             },
-            "fields": [
-                {
-                    "name": `\u200B`,
-                    "value": `*Nous nous réservons le droit de refuser les demandes si nous le considérons, pour toute autre question, dirigez vous vers les ${roleChefAdjoint}*`,
-                    "inline": false
-                },
-                {
-                    "name": "\u200B",
-                    "value": 'https://link.clashofclans.com/fr?action=OpenClanProfile&tag=2LV9J8VLQ',
-                    "inline": false
-                },
-            ],
+            {
+                "name": "\u200B",
+                "value": 'https://link.clashofclans.com/fr?action=OpenClanProfile&tag=2LV9J8VLQ',
+                "inline": false
+            },
+        ],
 
-        })
-    ] 
+    })
+    ]
 
     //! CHANNEL BIENVENU
     const channelBienvenu = await client.channels.cache.find(ch => ch.name == '1-bienvenue')
@@ -263,8 +279,8 @@ module.exports = async (client) => {
 
     //! CHANNEL INVITATION-CLAN
     const channelInvitationClan = await client.channels.cache.find(ch => ch.name == 'invitation-clan')
-    const messagesInvitationClan  = await channelInvitationClan.messages.fetch()
-    
+    const messagesInvitationClan = await channelInvitationClan.messages.fetch()
+
     if (messagesBienvenu.size === 0) {
         channelBienvenu.send(msgBienvenu);
     }
@@ -278,7 +294,7 @@ module.exports = async (client) => {
     if (messagesInvitationClan.size == 0) {
         await channelInvitationClan.send(
             {
-                embeds:msgInvitationClan, 
+                embeds: msgInvitationClan,
                 files: [file]
             });
     }

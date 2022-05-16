@@ -21,7 +21,7 @@ async function assignRole(newRole, discordMember, currentRoleName, guild) {
     }
 }
 async function updateNickname(discordMember, member) {
-    if (discordMember.guild.ownerId != discordMember.user.id) {
+    if (discordMember.guild.ownerId != discordMember.user.id && discordMember.nickname != member.name) {
         await discordMember.setNickname(member.name)
     }
 }
@@ -32,6 +32,7 @@ async function updateInfo(member, discordMember, guild) {
     const coLeaderRole = guild.roles.cache.find(r => r.name == 'Chef Adjoint')
     const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
     const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
+
     switch (member.role) {
         case 'leader':
             assignRole(leaderRole, discordMember, "Chef", guild)

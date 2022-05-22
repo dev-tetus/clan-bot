@@ -1,0 +1,9 @@
+version: '3'
+services:
+  api:
+    build:
+      context: services/accounts/
+      dockerfile: Dockerfile
+    image: accounts
+    volumes:
+      - ./api:/api

@@ -12,19 +12,20 @@ services:
       - 5000:80 #Host:Container (Check nginx-conf.confg; container port is the same as what NGINX is listening to)
   api-gateway:
     build:
-      context: api-gateway/
+      context: ./api-gateway
       dockerfile: Dockerfile
-      target: production
+      target: dev
     image: api-gateway
     volumes:
-      - ./api:/api
+      - ./api-gateway:/api-gateway
   bot:
     build:
-      context: bot/
+      context: ./bot
       dockerfile: Dockerfile
-      target: production
+      target: dev
     image: bot
     volumes:
       - ./bot:/bot
+      - /bot/node_modules
 
   

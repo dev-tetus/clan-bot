@@ -1,0 +1,21 @@
+{
+  "name": "clanbot",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev-run": "docker-compose -f compose-dev.yaml up --build -d",
+    "down":"docker-compose down",
+    "logs": "docker-compose logs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-tetus/clan-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dev-tetus/clan-bot/issues"
+  },
+  "homepage": "https://github.com/dev-tetus/clan-bot#readme"
+}

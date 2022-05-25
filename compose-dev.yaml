@@ -18,6 +18,7 @@ services:
     image: api-gateway
     volumes:
       - ./api-gateway:/api-gateway
+      - /api-gateway/node_modules
   bot:
     build:
       context: ./bot

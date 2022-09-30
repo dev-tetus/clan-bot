@@ -164,16 +164,11 @@ module.exports = async (client, interaction) => {
                     }
                     else {
                         dm = await user.createDM(true)
-
-
                         const messages = await dm.messages.fetch()
-                        console.log('here');
+                        
                         if (messages.size > 0) {
-
                             for (const message of messages) {
-                                if (message[1].author.bot === true) {
-                                    await message[1].delete();
-                                }
+                                if (message[1].author.bot === true) await message[1].delete();
                             }
                         }
                         var options1 = []
@@ -203,21 +198,25 @@ module.exports = async (client, interaction) => {
                                 new MessageSelectMenu()
                                     .setCustomId('player-selection')
                                     .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options1),
+                                    .addOptions(options1)
+                                
                             );
 
-                        console.log('here');
-                        dm.send({ components: [row] })
+                   
+                        await dm.send({ components: [row] })
 
-                        row = new MessageActionRow()
+                        if (count >= 25){
+                            row = new MessageActionRow()
                             .addComponents(
                                 new MessageSelectMenu()
                                     .setCustomId('player-selection')
                                     .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options2),
+                                    .addOptions(options2)
+                                
                             );
 
-                        dm.send({ components: [row] })
+                            await dm.send({ components: [row] })
+                        }
                         return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
                
 
@@ -227,7 +226,7 @@ module.exports = async (client, interaction) => {
                 if (e.name == 'DiscordAPIError') {
                     console.log(e);
                 }
-                console.log(e);
+                // console.log(e);
                 return interaction.editReply({ content: `Désolé ${interaction.member}, je n'ai pas pu éxecuter ta demande` })
 
             }

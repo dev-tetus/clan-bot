@@ -97,11 +97,7 @@ module.exports = async (client, interaction) => {
 
 
                     if ((user._roles.length >= 1 && !isInvite)) {
-                        console.log('has role');
-
-
-                        // return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
-
+        
                         if (user._roles.length > 1 && roles.some(r => r.name === 'Dev')) {
                             return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
                         }
@@ -161,6 +157,7 @@ module.exports = async (client, interaction) => {
                             return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`, ephemeral: true })
 
                         }
+                        console.log(interaction.member.roles);
                         return await interaction.editReply({ content: `Bien sûr que t'es dans la ${interaction.guild}, ${interaction.member}, t'es en tant que ${interaction.member.roles}`, ephemeral: true })
 
 
@@ -222,7 +219,7 @@ module.exports = async (client, interaction) => {
 
                         dm.send({ components: [row] })
                         return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
-                        return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
+               
 
                     }
                 }

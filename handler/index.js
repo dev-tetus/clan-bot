@@ -1,7 +1,6 @@
 const { glob } = require("glob");
 const { promisify } = require("util");
 const globPromise = promisify(glob);
-require('dotenv').config()
 
 
 

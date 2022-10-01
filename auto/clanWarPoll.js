@@ -55,24 +55,15 @@ async function sendPoll() {
 
     const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
 
-
     //! Delete all messages from annonces channel to send back again fresh ones
 
     for (var msg of pinnedMessagesAnnoncesGuerre) {
         if (response.data.state !== 'warEnded' && response.data.state !== 'notInWar') {
-            if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
+            if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') || msg[1].embeds[0].title.startsWith('[PHASE PRÉPARATION')) {
                 await msg[1].delete()
                 try {
                     await votesChannelMessages.first().delete()
                 } catch (error) { }
-            }
-            else if (msg[1].embeds[0].title.startsWith('[PHASE PRÉPARATION')) {
-                await msg[1].delete()
-
-                try {
-                    await votesChannelMessages.first().delete()
-                } catch (error) { }
-
             }
         }
         //? No war in progress
@@ -98,7 +89,7 @@ async function sendPoll() {
     }
 
     //! If no war in progress and no league war 
-    if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')) {
+    
         //! Beginning of month (start of league)
         if ((today >= 1 && today <= 5)) {
             await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
@@ -122,7 +113,7 @@ async function sendPoll() {
             await votesChannel.send(clanWarMembersEmbed('LDC'))
         }
         //! Casual war
-        else {
+        else if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')){
             await clanWarAnnoncesChannel.send(clanWarPollEmbed('GDC'))
             const channelPoll = await clanWarAnnoncesChannel.lastMessage
             await channelPoll.pin()
@@ -142,9 +133,7 @@ async function sendPoll() {
 
             }
             await votesChannel.send(clanWarMembersEmbed('GDC'))
-
         }
-    }
     //! Casual war preparation phase
     if (response.data.state === 'preparation') {
         console.log('In preparation');
@@ -185,7 +174,7 @@ async function sendPollLogic() {
         return new Date(Number(milliseconds) + epoch)
     }
 
-    // sendPoll()
+    sendPoll()
     schedule.scheduleJob(rule, sendPoll)
     getNextAnnouncementDate()
 }

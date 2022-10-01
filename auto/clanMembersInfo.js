@@ -32,6 +32,7 @@ async function updateInfo(member, discordMember, guild) {
     const coLeaderRole = guild.roles.cache.find(r => r.name == 'Chef Adjoint')
     const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
     const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
+    const inviteRole = guild.roles.cache.find(r=> r.name == "Invité")
 
     switch (member.role) {
         case 'leader':
@@ -46,21 +47,35 @@ async function updateInfo(member, discordMember, guild) {
         case 'member':
             assignRole(memberRole, discordMember, "Membre", guild)
             return updateNickname(discordMember, member)
+        default: return assignRole(inviteRole, discordMember, null)
     }
 }
 async function updateMember() {
     const guild = client.guilds.cache.first()
     const clanMembers = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
 
-    for (var member of clanMembers.data.items) {
-        let discordMember = await guild.members.search({ query: member.name })
-        if (discordMember.size == 0) {
-            console.log(`Member ${member.name} not found in discord`);
+
+    for(var discordMember of guild.members){
+        let clanMember = await clanMembers.data.items.search({ query: clanMember.name })
+        if (clanMember.size == 0) {
+            console.log(`Member ${discordMember.nickname} not found in clan`);
+            updateInfo(null, discordMember,guild)
         }
         else {
-            await updateInfo(member, discordMember.first(), guild)
+            await updateInfo(clanMember.first(), discordMember, guild)
         }
     }
+
+    // for (var member of clanMembers.data.items) {
+    //     let discordMember = await guild.members.search({ query: member.name })
+    //     if (discordMember.size == 0) {
+    //         console.log(`Member ${member.name} not found in discord`);
+    //         updateInfo(member, discordMember)
+    //     }
+    //     else {
+    //         await updateInfo(member, discordMember.first(), guild)
+    //     }
+    // }
 }
 module.exports = async () => {
     schedule.scheduleJob(rule, updateMember)

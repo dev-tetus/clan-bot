@@ -90,50 +90,54 @@ async function sendPoll() {
 
     //! If no war in progress and no league war 
     
-        //! Beginning of month (start of league)
-        if ((today >= 1 && today <= 5)) {
-            await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
-            const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
-            await channelPoll.pin()
-            try {
-                await clanWarLeagueAnnoncesChannel.lastMessage.delete()
+    //! Beginning of month (start of league)
+    if ((today >= 1 && today <= 5) && responseLeague.data.state != "inWar") {
+        await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
+        const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
+        await channelPoll.pin()
+        try {
+            await clanWarLeagueAnnoncesChannel.lastMessage.delete()
 
-            } catch (error) {
+        } catch (error) {
 
-            }
-
-            //! Send poll stats message
-            for (var msg of votesChannelMessages) {
-                if (msg[1].embeds[1].description === 'Liste joueurs recrutés') {
-                    console.log('Already poll stats message');
-                    getNextAnnouncementDate(schedule)
-                    return
-                }
-            }
-            await votesChannel.send(clanWarMembersEmbed('LDC'))
         }
-        //! Casual war
-        else if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')){
-            await clanWarAnnoncesChannel.send(clanWarPollEmbed('GDC'))
-            const channelPoll = await clanWarAnnoncesChannel.lastMessage
-            await channelPoll.pin()
-            await clanWarAnnoncesChannel.lastMessage.delete()
 
-
-            //! Send poll stats message
-            for (var msg of votesChannelMessages) {
-                if (response.data.state === 'notFound') {
-                    await msg[1].delete()
-                }
-                if (msg[1].embeds[0].description === 'Liste joueurs recrutés') {
-                    console.log('Already poll stats message');
-                    getNextAnnouncementDate(schedule)
-                    return
-                }
-
+        //! Send poll stats message
+        for (var msg of votesChannelMessages) {
+            if (msg[1].embeds[0].description === 'Liste joueurs recrutés') {
+                console.log('Already poll stats message');
+                getNextAnnouncementDate(schedule)
+                return
             }
-            await votesChannel.send(clanWarMembersEmbed('GDC'))
         }
+        await votesChannel.send(clanWarMembersEmbed('LDC'))
+    }
+    //! Casual war
+    else if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')){
+        await clanWarAnnoncesChannel.send(clanWarPollEmbed('GDC'))
+        const channelPoll = await clanWarAnnoncesChannel.lastMessage
+        await channelPoll.pin()
+        await clanWarAnnoncesChannel.lastMessage.delete()
+
+
+        //! Send poll stats message
+        for (var msg of votesChannelMessages) {
+            if (response.data.state === 'notFound') {
+                await msg[1].delete()
+            }
+            if (msg[1].embeds[0].description === 'Liste joueurs recrutés') {
+                console.log('Already poll stats message');
+                getNextAnnouncementDate(schedule)
+                return
+            }
+
+        }
+        await votesChannel.send(clanWarMembersEmbed('GDC'))
+    }
+
+
+    console.log(response);
+    console.log(responseLeague);
     //! Casual war preparation phase
     if (response.data.state === 'preparation') {
         console.log('In preparation');

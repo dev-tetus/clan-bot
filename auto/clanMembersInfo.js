@@ -33,7 +33,7 @@ async function updateInfo(member, discordMember, guild) {
     const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
     const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
     const inviteRole = guild.roles.cache.find(r=> r.name == "Invité")
-
+    if(member === null) return assignRole(inviteRole, discordMember, null, guild)
     switch (member.role) {
         case 'leader':
             assignRole(leaderRole, discordMember, "Chef", guild)
@@ -47,37 +47,34 @@ async function updateInfo(member, discordMember, guild) {
         case 'member':
             assignRole(memberRole, discordMember, "Membre", guild)
             return updateNickname(discordMember, member)
-        default: return assignRole(inviteRole, discordMember, null)
+        default: 
     }
 }
 async function updateMember() {
-    const guild = client.guilds.cache.first()
+    const guild = await client.guilds.fetch(process.env.GUILD_ID)
     const clanMembers = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
-
-
-    for(var discordMember of guild.members){
-        let clanMember = await clanMembers.data.items.search({ query: clanMember.name })
-        if (clanMember.size == 0) {
-            console.log(`Member ${discordMember.nickname} not found in clan`);
-            updateInfo(null, discordMember,guild)
+    const discordMembers =  await guild.members.fetch()
+    console.log(discordMembers);
+    for(var discordMember of discordMembers){
+        
+        console.log(discordMember[1].nickname);
+        let clanMember = await clanMembers.data.items.find(player => player.name == discordMember[1].nickname)
+        console.log(clanMember);
+        if (clanMember == undefined && !discordMember[1].user.bot) {
+            console.log(`Member ${discordMember[1].nickname} not found in clan`);
+            await updateInfo(null, discordMember[1], guild)
         }
-        else {
-            await updateInfo(clanMember.first(), discordMember, guild)
+        else if(clanMember){
+            await updateInfo(clanMember, discordMember[1], guild)
         }
     }
 
-    // for (var member of clanMembers.data.items) {
-    //     let discordMember = await guild.members.search({ query: member.name })
-    //     if (discordMember.size == 0) {
-    //         console.log(`Member ${member.name} not found in discord`);
-    //         updateInfo(member, discordMember)
-    //     }
-    //     else {
-    //         await updateInfo(member, discordMember.first(), guild)
-    //     }
-    // }
 }
-module.exports = async () => {
+async function scheduleRoleChange() {
     schedule.scheduleJob(rule, updateMember)
-
+}
+module.exports = {
+    updateMember,
+    scheduleRoleChange
+    
 }

@@ -25,8 +25,8 @@ function getNextAnnouncementDate() {
 
 async function sendPoll() {
     const today = new Date().getDate()
-    const clanWarAnnoncesChannel = await client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· GDC')
-    const clanWarLeagueAnnoncesChannel = await client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· LDC')
+    const clanWarAnnoncesChannel =  client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· GDC')
+    const clanWarLeagueAnnoncesChannel =  client.channels.cache.find(ch => ch.name == 'annonces' && ch.parent.name == '⚔· LDC')
 
     var responseLeague = null
     var response = null
@@ -58,28 +58,7 @@ async function sendPoll() {
     //! Delete all messages from annonces channel to send back again fresh ones
 
     for (var msg of pinnedMessagesAnnoncesGuerre) {
-        if (response.data.state !== 'warEnded' && response.data.state !== 'notInWar') {
-            if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') || msg[1].embeds[0].title.startsWith('[PHASE PRÉPARATION')) {
-                await msg[1].delete()
-                try {
-                    await votesChannelMessages.first().delete()
-                } catch (error) { }
-            }
-        }
-        //? No war in progress
-        else if ((msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') && responseLeague.data.status === 'notInWar') || (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]') && responseLeague.data.status === 'ended')) {
-            if (response.data.status != 'ended') {
-                if (convertSnowflakeToDate(msg[1].id).toLocaleDateString() >= warEndTime.toLocaleDateString()) {
-                    console.log('Already a poll...');
-                    return
-                }
-            }
-
-        }
-        //? War in progress
-        else {
-            await msg[1].delete()
-        }
+        await msg[1].delete()
     }
 
     //! Delete all messages from annonces channel to send back again fresh ones
@@ -91,7 +70,7 @@ async function sendPoll() {
     //! If no war in progress and no league war 
     
     //! Beginning of month (start of league)
-    if ((today >= 1 && today <= 5) && responseLeague.data.state != "inWar") {
+    if ((today >= 1 && today <= 5) && (responseLeague.data.state != "inWar" || responseLeague.data.state != "preparation")) {
         await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
         const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
         await channelPoll.pin()
@@ -105,7 +84,7 @@ async function sendPoll() {
         //! Send poll stats message
         for (var msg of votesChannelMessages) {
             if (msg[1].embeds[0].description === 'Liste joueurs recrutés') {
-                console.log('Already poll stats message');
+                console.log('Already poll stats message for league war');
                 getNextAnnouncementDate(schedule)
                 return
             }
@@ -122,11 +101,8 @@ async function sendPoll() {
 
         //! Send poll stats message
         for (var msg of votesChannelMessages) {
-            if (response.data.state === 'notFound') {
-                await msg[1].delete()
-            }
             if (msg[1].embeds[0].description === 'Liste joueurs recrutés') {
-                console.log('Already poll stats message');
+                console.log('Already poll stats message for war');
                 getNextAnnouncementDate(schedule)
                 return
             }
@@ -136,33 +112,39 @@ async function sendPoll() {
     }
 
 
-    console.log(response);
-    console.log(responseLeague);
     //! Casual war preparation phase
     if (response.data.state === 'preparation') {
         console.log('In preparation');
         const message = require('../messages/clanWarPreparation')(response.data)
         await clanWarAnnoncesChannel.send(message)
-        const channelPoll = await clanWarAnnoncesChannel.lastMessage
-        await channelPoll.pin()
+        const channelPollMessage = await clanWarAnnoncesChannel.lastMessage
+        await channelPollMessage.pin()
         await clanWarAnnoncesChannel.lastMessage.delete()
     }
+     //! Casual war war phase
+    if (response.data.state === 'inWar') {
+    console.log('Casual war started...');
+    const message = require('../messages/clanWarInWar')(response)
+    await clanWarAnnoncesChannel.send(message)
+    const clanWarAnnoncesMessage = await clanWarAnnoncesChannel.lastMessage
+    await clanWarAnnoncesMessage.pin()
+    await clanWarAnnoncesChannel.lastMessage.delete()
+    }
     //! League war preparation phase
-    if (responseLeague.data.reason != 'notFound' && responseLeague.data.state === 'preparation') {
+    if (responseLeague.data.state === 'preparation') {
         const message = require('../messages/clanWarLeaguePreparation')(responseLeague.data)
         await clanWarLeagueAnnoncesChannel.send(message)
         const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
         await channelPoll.pin()
         await clanWarLeagueAnnoncesChannel.lastMessage.delete()
-
     }
     //! League war in progress
-    if (responseLeague.data.reason != 'notFound' && responseLeague.data.state === 'inWar') {
+    if (responseLeague.data.state === 'inWar') {
         await require('../requests/leagueWarDay')(clanWarLeagueAnnoncesChannel)
         //? Sleep
         await new Promise(r => setTimeout(r, 500));
 
-        await require('../requests/leagueWarPreparationNextDay')(clanWarLeagueAnnoncesChannel)
+        await require('../requests/leagueWarPreparationNextDay')(clanWarLeagueAnnoncesChannel, false)
     }
 }
 

@@ -9,7 +9,7 @@ module.exports = (response) => {
         'opponent':response.data.opponent.name,
         'attacks': response.data.clan.attacks,
         'enemyAttacks': response.data.opponent.attacks,
-        'totalAttacks': response.data.teamSize,
+        'totalAttacks': response.data.teamSize * 2,
         'stars': response.data.clan.stars,
         'enemyStars': response.data.opponent.stars,
         'endTime': response.data.endTime

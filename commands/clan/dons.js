@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const axios = require('../../axios/axios');
 
 module.exports = {
-    name: "donations",
-    description: "Donne les donations moyenne du clan",
+    name: "dons",
+    description: "Donne la moyenne de dons du clan",
     type: 'CHAT_INPUT',
     options: [{
         required:false,

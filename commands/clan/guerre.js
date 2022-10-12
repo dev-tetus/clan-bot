@@ -10,7 +10,7 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true }).catch(() => { })
         for (var role of interaction.member._roles) {
             role =  interaction.guild.roles.resolve(role);
-            if (role.name == "Chef Adjoint"){
+            if (role.name == "Chef Adjoint" || role.name == "Chef"){
                 sendPoll()
                 return await interaction.followUp({ content: `Commande exectuée` })
             }

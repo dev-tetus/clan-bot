@@ -160,7 +160,6 @@ async function sendPollLogic() {
         return new Date(Number(milliseconds) + epoch)
     }
 
-    sendPoll()
     schedule.scheduleJob(rule, sendPoll)
     getNextAnnouncementDate()
 }

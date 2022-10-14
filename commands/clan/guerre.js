@@ -12,7 +12,7 @@ module.exports = {
             role =  interaction.guild.roles.resolve(role);
             if (role.name == "Chef Adjoint" || role.name == "Chef"){
                 sendPoll()
-                return await interaction.followUp({ content: `Commande exectuée` })
+                return await interaction.followUp({ content: `Commande executée` })
             }
         }
         return await interaction.followUp({ content: `Désolé ${interaction.member.nickname}, mais tu n'as pas accès à cette commande`})

@@ -1,11 +1,12 @@
 const { MessageEmbed } = require('discord.js');
 
 module.exports = (event) => {
+    
+    var embed = new MessageEmbed()
+    .setColor('#c7c7c7')
+    .setDescription(`Liste joueurs recrutés`)
+    .setTimestamp(new Date())
 
-    const embed = new MessageEmbed()
-        .setColor('#c7c7c7')
-        .setDescription(`Liste joueurs recrutés`)
-        .setTimestamp()
 
     switch (event) {
         case 'GDC':
@@ -18,7 +19,7 @@ module.exports = (event) => {
             break;
     }
 
-    const msg = {
+    var msg = {
         "embeds": [embed],
         "components": [
             {

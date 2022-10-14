@@ -15,12 +15,12 @@ module.exports = async (client, interaction) => {
     var pollMessage = null
 
     for (var msg of pinnedMessages) {
-        if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
+        if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
     }
     for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
-        if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
+        if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
     }

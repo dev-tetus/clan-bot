@@ -5,9 +5,9 @@ module.exports = (event) => {
 
     const embed = new MessageEmbed()
         .setColor('#c7c7c7')
-        .setTitle(`[PHASE VOTATION]** ** ⚔ Votation Prochaine ${event} ⚔`)
+        .setTitle(`[PHASE VOTE]** ** ⚔ Votation Prochaine ${event} ⚔`)
         .addField(`** \n**Serais-tu disponible?`, "** **", false)
-        .setTimestamp()
+        .setTimestamp(new Date())
 
     switch (event) {
 

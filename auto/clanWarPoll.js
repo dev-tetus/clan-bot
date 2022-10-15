@@ -13,7 +13,8 @@ rule.hour = [8, 12, 19]
 rule.minute = '00'
 rule.tz = 'Europe/Madrid'
 
-
+const inWarStatus = ["preparation","inWar"]
+const notWarStatus = ["notFound","notInWar","ended"]
 
 
 function getNextAnnouncementDate() {
@@ -21,6 +22,11 @@ function getNextAnnouncementDate() {
     invocationDate = jobTimeData.day + '-' + jobTimeData.month + '-' + jobTimeData.year + " " + jobTimeData.hour + ":" + jobTimeData.minute
     return console.log('Next announcement scheduled at: ' + invocationDate);
 
+}
+
+function isNotInWar(response, responseLeague){
+    if(inWarStatus.includes(response.data.state == "inPrep") || inWarStatus.includes(responseLeague.data.status == "inPrep")) return true
+    else return false
 }
 
 async function sendPoll() {
@@ -49,10 +55,13 @@ async function sendPoll() {
     //! Delete old list of recruted players
 
     for(var msg of votesChannelMessages.values()){
-        warDate =  response.data.state != "notFound" ? response.data.startTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
+        warDate =  response.data.state != "notFound" ? response.data.endTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
         console.log(warDate);
         console.log(parseUnixDate(msg.embeds[0].timestamp));
-        if(warDate != null && parseUnixDate(msg.embeds[0].timestamp) < warDate){
+        console.log(parseUnixDate(msg.embeds[0].timestamp) < warDate );
+        if(!isNotInWar(response,responseLeague) && warDate != null && parseUnixDate(msg.embeds[0].timestamp) > warDate){
+            // console.log(warDate);
+            // console.log(parseUnixDate(msg.embeds[0].timestamp));
             console.log("Message delete");
             await msg.delete()
         }
@@ -163,8 +172,8 @@ function scheduleJobAtTime(rule) {
     return getNextAnnouncementDate(schedule)
 }
 function parseUnixDate(time) {
-    console.log(time);
-    return new Date(value=time).toISOString().replace(/[:-]/g,"")
+    date = new Date(value=time)
+    return date.toISOString().replace(/[:-]/g,"")
 }
 async function sendPollLogic() {
 

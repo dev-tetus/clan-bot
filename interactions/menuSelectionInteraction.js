@@ -6,7 +6,11 @@ const axios = require('../axios/axios')
 module.exports = async (client, interaction) => {
 
     if (interaction.channel.type === 'DM' && (interaction.customId === 'player-selection'|| interaction.customId === 'player-selection-2')) {
+
         const channelAnnoncesInvites = await client.channels.cache.find(ch => ch.name == 'qui-est-arrivé')
+        const channelChatGeneral = await client.channels.cache.find(ch => ch.name == 'chat')
+        const chanelInvitationClan = await client.channels.cache.find(ch => ch.name == 'invitation-clan')
+        const channelBienvenue = await client.channels.cache.find(ch => ch.name == '1-bienvenue')
 
         await interaction.editReply({
             content: `Okay ${interaction.user}! Presque finis!\nS'il te plaît, rentre le code géneré par le jeux pour la verification du compte Clash of Clans! Prends ton temps, au bout de 2 minutes t'auras à nouveau de proposé le menu de sélection de joueur si jamais tu n'as pas eu le temps ;)\nMerci! ;)`,
@@ -73,15 +77,19 @@ module.exports = async (client, interaction) => {
                         await interaction.followUp(`Félicitations ${interaction.user}! Tu as désormais le rôle '${newRole.name}'`)
                         if (server_member.roles.cache.some(r => r.name === inviteRole.name)) {
                             await server_member.roles.remove(inviteRole);
-                            channelAnnoncesInvites.send({
+                            await channelAnnoncesInvites.send({
 
                                 content: `${interaction.user} est maintenant ${newRole}!`
                             })
+                            await channelChatGeneral.send({ content: `Salut! ${interaction.user}, tu as le lien d'invitation dans ${chanelInvitationClan},
+                            une fois que t'as rejoint, c'est important que tu refasses la vérification de ton compte dans ${channelBienvenue}, pour que ton profil discord se mette
+                            à jour avec ton compte CoC! Merci!`})
                         }
                         else {
-                            channelAnnoncesInvites.send({
+                            await channelAnnoncesInvites.send({
                                 content: `${interaction.user} vient d'arriver en étant ${newRole}!`
                             })
+                            await channelChatGeneral.send({ content:`Bienvenue ${interaction.user}!!`} )
                         }
                     }
                 }

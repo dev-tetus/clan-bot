@@ -1,5 +1,5 @@
 require('dotenv').config()
-const axios = require('../axios/axios')
+const {axiosBase} = require('../axios/axios')
 const schedule = require('node-schedule')
 
 const client = require("../index");
@@ -25,8 +25,8 @@ function getNextAnnouncementDate() {
 }
 
 function isNotInWar(response, responseLeague){
-    if(inWarStatus.includes(response.data.state == "inPrep") || inWarStatus.includes(responseLeague.data.status == "inPrep")) return true
-    else return false
+    if(inWarStatus.includes(response.data.state) || inWarStatus.includes(responseLeague.data.status)) return false
+    else return true
 }
 
 async function sendPoll() {
@@ -37,13 +37,13 @@ async function sendPoll() {
     var responseLeague = null
     var response = null
     try {
-        response = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar`)
+        response = await axiosBase.get(`/clans/${process.env.CLAN_TAG}/currentwar`)
     } catch (error) {
         response = { data: { state: 'notFound' } }
     }
 
     try {
-        responseLeague = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
+        responseLeague = await axiosBase().get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
     } catch (error) {
         responseLeague = { data: { reason: 'notFound' } }
     }
@@ -53,17 +53,23 @@ async function sendPoll() {
     const votesChannelMessages = await votesChannel.messages.fetch()
 
     //! Delete old list of recruted players
-
+    // -- CHECK FOR WAR STATUS AND ITS WAR PHASES TIMESTAMPS AT CoC API
     for(var msg of votesChannelMessages.values()){
         warDate =  response.data.state != "notFound" ? response.data.endTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
         console.log(warDate);
         console.log(parseUnixDate(msg.embeds[0].timestamp));
         console.log(parseUnixDate(msg.embeds[0].timestamp) < warDate );
-        if(!isNotInWar(response,responseLeague) && warDate != null && parseUnixDate(msg.embeds[0].timestamp) > warDate){
-            // console.log(warDate);
-            // console.log(parseUnixDate(msg.embeds[0].timestamp));
-            console.log("Message delete");
-            await msg.delete()
+        if(warDate != null){
+            if(!isNotInWar(response,responseLeague) && parseUnixDate(msg.embeds[0].timestamp) > warDate){
+                // console.log(warDate);
+                // console.log(parseUnixDate(msg.embeds[0].timestamp));
+                console.log("Message delete");
+                await msg.delete()
+            }
+            else if(isNotInWar(response,responseLeague)){
+                
+            }
+
         }
     }
     
@@ -176,10 +182,6 @@ function parseUnixDate(time) {
     return date.toISOString().replace(/[:-]/g,"")
 }
 async function sendPollLogic() {
-
-
-    
-
     schedule.scheduleJob(rule, sendPoll)
     getNextAnnouncementDate()
 }

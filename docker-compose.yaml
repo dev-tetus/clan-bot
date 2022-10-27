@@ -18,7 +18,7 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
-      target: dev
+      target: production
     image: api-gateway
     environment:
       COMPOSE_PROJECT_NAME: 'ClanBot'
@@ -29,7 +29,7 @@ services:
     build:
       context: ./bot
       dockerfile: Dockerfile
-      target: dev
+      target: production
     image: bot
     environment:
       COMPOSE_PROJECT_NAME: 'ClanBot'

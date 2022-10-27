@@ -8,7 +8,7 @@ CMD ["npm","run", "start-dev"]
 
 FROM node:17-alpine3.14 as production
 WORKDIR /api-gateway
-COPY package*.json .
+COPY package*.json ./
 RUN npm install --silent
 ENV NODE_ENV = "production"
 COPY ./ ./

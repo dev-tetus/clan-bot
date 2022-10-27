@@ -1,4 +1,4 @@
-const axios = require('../../axios/axios')
+const {axiosBase} = require('../../axios/axios')
 const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
 
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: true }).catch(() => { });
-        const player_tags = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
+        const player_tags = await axiosBase.get(`/clans/${process.env.CLAN_TAG}/members`)
 
         var options1 = []
         var options2 = []

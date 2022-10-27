@@ -1,6 +1,6 @@
 const { MessageCollector } = require('discord.js')
 
-const axios = require('../axios/axios')
+const {axiosBase} = require('../axios/axios')
 const client = require("../index");
 
 const buttonInteraction = require('../interactions/buttonInteraction.js')

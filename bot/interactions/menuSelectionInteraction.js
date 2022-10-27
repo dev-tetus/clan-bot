@@ -1,6 +1,6 @@
 require('dotenv').config()
 const { MessageActionRow, MessageSelectMenu, CommandInteractionOptionResolver } = require('discord.js');
-const axios = require('../axios/axios')
+const {axiosBase} = require('../axios/axios')
 
 
 module.exports = async (client, interaction) => {
@@ -30,7 +30,7 @@ module.exports = async (client, interaction) => {
         collector.on('end', async (collected, reason) => {
 
             try {
-                response = await axios.post(`/players/${user_tag}/verifytoken`, {
+                response = await axiosBase.post(`/players/${user_tag}/verifytoken`, {
                     token: collected.at(0).content,
                 })
             } catch (error) {
@@ -43,7 +43,7 @@ module.exports = async (client, interaction) => {
                 }
                 else {
                     if (user_tag) {
-                        const player_role = await axios.get(`/players/${user_tag}`)
+                        const player_role = await axiosBase.get(`/players/${user_tag}`)
                         const player_nickname = player_role.data.name
                         var newRole = null
 
@@ -142,7 +142,7 @@ module.exports = async (client, interaction) => {
         collector.on('end', async (collected, reason) => {
 
             try {
-                response = await axios.post(`/players/${user_tag}/verifytoken`, {
+                response = await axiosBase.post(`/players/${user_tag}/verifytoken`, {
                     token: collected.at(0).content,
                 })
             } catch (error) {
@@ -155,7 +155,7 @@ module.exports = async (client, interaction) => {
                 }
                 else {
                     if (user_tag) {
-                        const player_role = await axios.get(`/players/${user_tag}`)
+                        const player_role = await axiosBase.get(`/players/${user_tag}`)
                         const player_nickname = player_role.data.name
                         var newRole = null
 

@@ -1,4 +1,4 @@
-const axios = require('../../axios/axios');
+const {axiosBase} = require('../../axios/axios');
 const {sendPoll} = require('../../auto/clanWarPoll')
 
 

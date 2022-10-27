@@ -1,5 +1,5 @@
 const client = require('../index')
-const axios = require('../axios/axios');
+const {axiosBase} = require('../axios/axios');
 const schedule = require('node-schedule')
 
 const rule = new schedule.RecurrenceRule()
@@ -60,7 +60,7 @@ async function updateInfo(member, discordMember, guild) {
 }
 async function updateMember() {
     const guild = await client.guilds.fetch(process.env.GUILD_ID)
-    const clanMembers = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
+    const clanMembers = await axiosBase.get(`/clans/${process.env.CLAN_TAG}/members`)
 
     for (var dmember of await guild.members.fetch()){
         console.log(dmember[1]);

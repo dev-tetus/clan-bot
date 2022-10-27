@@ -1,4 +1,4 @@
-const axios = require('../axios/axios')
+const axiosBase = require('../axios/axios')
 const clanWarLeagueInWarEmbed = require('../messages/clanWarLeagueInWar')
 
 module.exports = async (clanWarLeagueAnnoncesChannel) =>{
@@ -9,7 +9,7 @@ module.exports = async (clanWarLeagueAnnoncesChannel) =>{
     var warTags = []
     rounds.forEach(async (round,i) =>{
          round.warTags.forEach(async warLeagueTag => {
-            var leagueWarResponse = await axios.get(`/clanwarleagues/wars/${warLeagueTag.replace('#','%23')}`)
+            var leagueWarResponse = await axiosBase.get(`/clanwarleagues/wars/${warLeagueTag.replace('#','%23')}`)
             if(leagueWarResponse.data.state === 'inWar'){
                 if(leagueWarResponse.data.clan.name === 'SN3T'){
                     const data ={

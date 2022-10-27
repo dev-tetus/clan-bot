@@ -26,17 +26,17 @@ services:
     volumes:
       - ./api-gateway:/api-gateway
       - /api-gateway/node_modules
-  # bot:
-  #   build:
-  #     context: ./bot
-  #     dockerfile: Dockerfile
-  #     target: dev
-  #   image: bot
-  #   environment:
-  #     COMPOSE_PROJECT_NAME: 'ClanBot'
-  #   volumes:
-  #     - ./bot:/bot
-  #     - /bot/node_modules
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+      target: dev
+    image: bot
+    environment:
+      COMPOSE_PROJECT_NAME: 'ClanBot'
+    volumes:
+      - ./bot:/bot
+      - /bot/node_modules
   python-api:
     build:
       context: ../BotPython

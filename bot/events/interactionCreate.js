@@ -1,4 +1,3 @@
-require('dotenv').config()
 const { MessageCollector } = require('discord.js')
 
 const axios = require('../axios/axios')

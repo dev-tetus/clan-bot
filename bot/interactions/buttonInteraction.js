@@ -15,12 +15,12 @@ module.exports = async (client, interaction) => {
     var pollMessage = null
 
     for (var msg of pinnedMessages) {
-        if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
+        if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
     }
     for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
-        if (msg[1].embeds[0].title.startsWith('[PHASE VOTATION]')) {
+        if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
     }
@@ -97,11 +97,7 @@ module.exports = async (client, interaction) => {
 
 
                     if ((user._roles.length >= 1 && !isInvite)) {
-                        console.log('has role');
-
-
-                        // return await interaction.editReply({ content: `T'es déjà dans le clan ${interaction.member}...`, ephemeral: true })
-
+        
                         if (user._roles.length > 1 && roles.some(r => r.name === 'Dev')) {
                             return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
                         }
@@ -161,22 +157,18 @@ module.exports = async (client, interaction) => {
                             return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`, ephemeral: true })
 
                         }
+                        console.log(interaction.member.roles);
                         return await interaction.editReply({ content: `Bien sûr que t'es dans la ${interaction.guild}, ${interaction.member}, t'es en tant que ${interaction.member.roles}`, ephemeral: true })
 
 
                     }
                     else {
                         dm = await user.createDM(true)
-
-
                         const messages = await dm.messages.fetch()
-                        console.log('here');
+                        
                         if (messages.size > 0) {
-
                             for (const message of messages) {
-                                if (message[1].author.bot === true) {
-                                    await message[1].delete();
-                                }
+                                if (message[1].author.bot === true) await message[1].delete();
                             }
                         }
                         var options1 = []
@@ -206,23 +198,27 @@ module.exports = async (client, interaction) => {
                                 new MessageSelectMenu()
                                     .setCustomId('player-selection')
                                     .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options1),
+                                    .addOptions(options1)
+                                
                             );
 
-                        console.log('here');
-                        dm.send({ components: [row] })
+                   
+                        await dm.send({ components: [row] })
 
-                        row = new MessageActionRow()
+                        if (count >= 25){
+                            row = new MessageActionRow()
                             .addComponents(
                                 new MessageSelectMenu()
                                     .setCustomId('player-selection')
                                     .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options2),
+                                    .addOptions(options2)
+                                
                             );
 
-                        dm.send({ components: [row] })
+                            await dm.send({ components: [row] })
+                        }
                         return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
-                        return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
+               
 
                     }
                 }
@@ -230,7 +226,7 @@ module.exports = async (client, interaction) => {
                 if (e.name == 'DiscordAPIError') {
                     console.log(e);
                 }
-                console.log(e);
+                // console.log(e);
                 return interaction.editReply({ content: `Désolé ${interaction.member}, je n'ai pas pu éxecuter ta demande` })
 
             }

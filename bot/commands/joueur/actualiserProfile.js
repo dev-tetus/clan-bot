@@ -40,17 +40,19 @@ module.exports = {
                     .setPlaceholder('Sélectionnez votre nom')
                     .addOptions(options1),
             );
-
+        await interaction.followUp({ content: "Choisis ton profile", components: [row], ephemeral: true})
             
-            
-        let row2 = new MessageActionRow()
-            .addComponents(
-                new MessageSelectMenu()
-                    .setCustomId('player-selection-2')
-                    .setPlaceholder('Sélectionnez votre nom')
-                    .addOptions(options2),
-            );
-        await interaction.followUp({ content: "Choisis ton profile", components: [row,row2], ephemeral: true})
+        if(count >= 25){
+            let row2 = new MessageActionRow()
+                .addComponents(
+                    new MessageSelectMenu()
+                        .setCustomId('player-selection-2')
+                        .setPlaceholder('Sélectionnez votre nom')
+                        .addOptions(options2),
+                );
+            await interaction.followUp({components: [row2], ephemeral: true})
+        }   
+       
         // return await interaction.followUp({components: [row], ephemeral: true})
 
     }

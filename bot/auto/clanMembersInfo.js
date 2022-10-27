@@ -9,15 +9,22 @@ rule.tz = 'Europe/Madrid'
 
 
 async function assignRole(newRole, discordMember, currentRoleName, guild) {
+    // console.log(discordMember)
     for (var role of discordMember._roles) {
         role = guild.roles.resolve(role);
 
-        if (role.name != currentRoleName && role.name != 'Server Booster' && role.name != 'Membre Fondateur' && role.name != 'Dev') {
+        if(currentRoleName === null){
             await discordMember.roles.remove(role)
             await discordMember.roles.add(newRole)
-            return console.log(`New role assigned to ${discordMember.nickname} as ${newRole}`);
+            return console.log(`New role assigned to ${discordMember.nickname === null ? discordMember.user.username : discordMember.nickname} as ${newRole.name}`);
         }
-        else return console.log(`Already with role ${role.name}`);
+
+        else if (role.name != currentRoleName && role.name != 'Server Booster' && role.name != 'Membre Fondateur' && role.name != 'Dev') {
+            await discordMember.roles.remove(role)
+            await discordMember.roles.add(newRole)
+            return console.log(`New role assigned to ${discordMember.nickname === null ? discordMember.user.username : discordMember.nickname} as ${newRole.name}`);
+        }
+        else return console.log(`${discordMember.nickname === null ? discordMember.user.username : discordMember.nickname} already with role ${role.name}`);
     }
 }
 async function updateNickname(discordMember, member) {
@@ -32,6 +39,7 @@ async function updateInfo(member, discordMember, guild) {
     const coLeaderRole = guild.roles.cache.find(r => r.name == 'Chef Adjoint')
     const veteranRole = guild.roles.cache.find(r => r.name == 'Ainé')
     const memberRole = guild.roles.cache.find(r => r.name == 'Membre')
+    const inviteRole = guild.roles.cache.find(r => r.name == 'Invité')
 
     switch (member.role) {
         case 'leader':
@@ -46,23 +54,31 @@ async function updateInfo(member, discordMember, guild) {
         case 'member':
             assignRole(memberRole, discordMember, "Membre", guild)
             return updateNickname(discordMember, member)
+        case null:
+            assignRole(inviteRole, discordMember,null, guild=guild)
     }
 }
 async function updateMember() {
-    const guild = client.guilds.cache.first()
+    const guild = await client.guilds.fetch(process.env.GUILD_ID)
     const clanMembers = await axios.get(`/clans/${process.env.CLAN_TAG}/members`)
 
-    for (var member of clanMembers.data.items) {
-        let discordMember = await guild.members.search({ query: member.name })
-        if (discordMember.size == 0) {
-            console.log(`Member ${member.name} not found in discord`);
+    for (var dmember of await guild.members.fetch()){
+        console.log(dmember[1]);
+        let clanMember =clanMembers.data.items.find(cMember => cMember.name === dmember[1].nickname || cMember.name === dmember[1].user.username)
+        if(dmember[1].user.bot == false){
+            if(clanMember === undefined){
+                console.log(`Member ${dmember[1].nickname === null ? dmember[1].user.username : dmember[1].nickname} not found in clan`);
+                updateInfo({role:null}, dmember[1], guild)
+            }
+            else {
+                await updateInfo(clanMember, dmember[1], guild)
+            }
         }
-        else {
-            await updateInfo(member, discordMember.first(), guild)
-        }
+ 
     }
+
 }
 module.exports = async () => {
     schedule.scheduleJob(rule, updateMember)
-
+    // updateMember()
 }

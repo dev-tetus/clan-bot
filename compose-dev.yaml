@@ -9,23 +9,11 @@ services:
     volumes: # association of config file from the host to the container
       - ./nginx/nginx-conf.conf:/etc/nginx/nginx.conf 
     depends_on:
-      - api-gateway
-      # - bot
+      - bot
       - mysql
       - python-api
     ports:
       - 5000:80 #Host:Container (Check nginx-conf.confg; container port is the same as what NGINX is listening to)
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
-      target: dev
-    image: api-gateway
-    environment:
-      COMPOSE_PROJECT_NAME: 'ClanBot'
-    volumes:
-      - ./api-gateway:/api-gateway
-      - /api-gateway/node_modules
   bot:
     build:
       context: ./bot

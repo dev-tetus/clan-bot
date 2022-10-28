@@ -113,8 +113,9 @@ module.exports = async (client, interaction) => {
                                         }
                                     }
                                 }
+                                console.log('here');
                                 await msg[1].edit({ 'components': msg[1].components })
-                                await axiosInternal().post(`/flask/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
+                                await axiosInternal().post(`/api/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
                                 return interaction.editReply({ content: `✅ Ton vote a bien été pris en compte ${interaction.member} ✅`, ephemeral: true })
                             }
                             else {                                                          //At least 1 member
@@ -143,7 +144,7 @@ module.exports = async (client, interaction) => {
                                     'description': 'Ne veut pas être en guerre'
                                 })
                                 await msg[1].edit({ 'components': msg[1].components })
-                                await axiosInternal().post(`/flask/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
+                                await axiosInternal().post(`/api/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
                                 return await interaction.editReply({ content: `✅ Ton vote a bien été pris en compte ${interaction.member} ✅`, ephemeral: true })
                             }
 
@@ -177,7 +178,7 @@ module.exports = async (client, interaction) => {
                                     }
                                 }
                                 await msg[1].edit({ 'components': msg[1].components })
-                                await axiosInternal().post(`/flask/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
+                                await axiosInternal().post(`/api/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
                                 return await interaction.editReply({ content: `✅ Ton vote a bien été pris en compte ${interaction.member}✅`, ephemeral: true })
                             }
                             else {                                                          //At least 1 member
@@ -203,7 +204,7 @@ module.exports = async (client, interaction) => {
                                     'description': 'Veut être en guerre'
                                 })
                                 await msg[1].edit({ 'components': msg[1].components })
-                                await axiosInternal().post(`/flask/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
+                                await axiosInternal().post(`/api/clan/player/${interaction.member.nickname === null ? interaction.member.user.username : interaction.member.nickname}/vote`)
                                 return await interaction.editReply({ content: `✅ Ton vote a bien été pris en compte ${interaction.member}✅`, ephemeral: true })
                             }
 

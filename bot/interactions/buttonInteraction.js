@@ -1,6 +1,8 @@
 require('dotenv').config()
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+
 const {axiosBase,axiosInternal} = require('../axios/axios')
+const {sendDmWithPlayers} = require('../utils/player/dmVerification')
+const updateInfo = require('../utils/player/playerInfo')
 
 module.exports = async (client, interaction) => {
     const channelBienvenu = await client.channels.cache.find(ch => ch.name == '1-bienvenue')
@@ -14,12 +16,12 @@ module.exports = async (client, interaction) => {
     const pinnedMessagesAnnoncesLeagueChannel = await clanWarLeagueAnnoncesChannel.messages.fetchPinned()
     var pollMessage = null
 
-    for (var msg of pinnedMessages) {
+    for (let msg of pinnedMessages) {
         if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
     }
-    for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
+    for (let msg of pinnedMessagesAnnoncesLeagueChannel) {
         if (msg[1].embeds[0].title.startsWith('[PHASE VOTE]')) {
             pollMessage = msg[1]
         }
@@ -35,198 +37,50 @@ module.exports = async (client, interaction) => {
 
                 //? As a guest
                 if (interaction.customId === '0') {
-
                     if (user._roles > 0 && user.roles.cache.some(role => role.name === 'Invité')) {
-
                         interaction.editReply({
                             content: `Salut ${user}!👋 Nous avons bien conscience que t'es ici en tant que ${roles.find(r => r.name == 'Invité')}, nous t'invitons à aller dans ${channelDiscussionsInvites} pour discuter avec nous et dans ${channelPostulerInvites} pour t'annoncer si jamais tu souhaiterais rentrer dans le clan!`, ephemeral: true
                         })
                     }
-                    else if ((!roles.some(role => role.name === 'Invité')) && (user._roles.length > 1)) {
-                        if (roles.some(r => r.name == 'Dev')) {//Only for only Dev role case 
-                            if (user._roles.length == 2) {
-                                if (!roles.some(r => r.name == 'ServerBooster')) {
-                                    return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
-
-                                }
-                                else {
-                                    let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                                    await user.roles.add(role);
-                                    await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
-                                    channelAnnoncesInvites.send({
-                                        content: `${interaction.member} vient d'arriver et est désormais un ${role}`
-                                    })
-                                    return
-                                }
-                            }
-                            else if (user._roles.length > 2) {
-                                return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
-
-                            }
-                            else {
-                                let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                                await user.roles.add(role);
-                                await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
-                                channelAnnoncesInvites.send({
-                                    content: `${interaction.member} vient d'arriver et est désormais un ${role}`
-                                })
-                                return
-                            }
-
-                        }
-
-                        return await interaction.editReply({ content: `Salut ${user}!!👋 C'est rigolo d'avoir mis non hein! 😅 J'espère que tout se passe bien pour toi, n'oublie pas de mettre tes 👷‍♂️ à travailler et d'améliorer quelque chose dans ton laboratoire! 💯`, ephemeral: true })
-                    }
-                    else {
-
-                        let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
-                        await user.roles.add(role);
-                        await interaction.editReply({ content: `Ça y est ${interaction.member}, tu as désormais le rôle ${role}`, ephemeral: true })
+                    else if (roles.some(role => role.name === 'Server Booster') && user._roles.length <= 1) {
+                        console.log('here');
+                        const role = updateInfo({role:null}, user, interaction.guild)
+                        await interaction.editReply({ content: `Ça y est ${user}, tu as désormais le rôle ${role}`, ephemeral: true })
                         channelAnnoncesInvites.send({
                             content: `${interaction.member} vient d'arriver et est désormais un ${role}`
                         })
+
                     }
+                    else {
+                        await interaction.editReply({ content: `Salut ${user}, tu es déjà dans le clan...`, ephemeral: true })
+                    }
+                    
 
                 }
                 //? As a member
                 else {
-
-                    let role = interaction.guild.roles.cache.find(r => r.name === "Invité");
                     const isInvite = user.roles.cache.some(r => r.name === 'Invité')
                     const player_tags = await axiosBase().get(`/clans/${process.env.CLAN_TAG}/members`)
-
-
                     if ((user._roles.length >= 1 && !isInvite)) {
-        
+                        
                         if (user._roles.length > 1 && roles.some(r => r.name === 'Dev')) {
                             return await interaction.editReply({ content: `Salut ${user}!!👋 Je n'ai pas trop de travail pour le moment... tout se passe bien :D`, ephemeral: true })
                         }
                         else if (user._roles.length == 1 && roles.some(r => r.name === 'Server Booster')) {
-                            dm = await user.createDM(true)
-
-                            const messages = await dm.messages.fetch()
-                            if (messages.size > 0) {
-
-                                for (const message of messages) {
-                                    if (message[1].author.bot === true) {
-                                        await message[1].delete();
-                                    }
-                                }
-                            }
-                            //! Limit of 25 options to choose for menu selection
-                            var options1 = []
-                            var options2 = []
-                            let count = 0;
-                            player_tags.data.items.forEach(player => {
-                                let { tag, name, role } = player
-                                if (count < 25) {
-                                    count++
-                                    let option = {
-                                        label: name,
-                                        value: tag
-                                    }
-                                    options1.push(option)
-                                }
-                                else {
-                                    let option = {
-                                        label: name,
-                                        value: tag
-                                    }
-                                    options2.push(option)
-                                }
-
-                            })
-                            let row = new MessageActionRow()
-                                .addComponents(
-                                    new MessageSelectMenu()
-                                        .setCustomId('player-selection')
-                                        .setPlaceholder('Sélectionnez votre nom')
-                                        .addOptions(options1),
-                                );
-                            dm.send({ components: [row] })
-
-                            row = new MessageActionRow()
-                                .addComponents(
-                                    new MessageSelectMenu()
-                                        .setCustomId('player-selection')
-                                        .setPlaceholder('Sélectionnez votre nom')
-                                        .addOptions(options2),
-                                );
-
-                            dm.send({ components: [row] })
-                            return await interaction.editReply({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!`, ephemeral: true })
-
+                            await sendDmWithPlayers(user,player_tags,interaction)
                         }
-                        console.log(interaction.member.roles);
                         return await interaction.editReply({ content: `Bien sûr que t'es dans la ${interaction.guild}, ${interaction.member}, t'es en tant que ${interaction.member.roles}`, ephemeral: true })
-
-
                     }
                     else {
-                        dm = await user.createDM(true)
-                        const messages = await dm.messages.fetch()
-                        
-                        if (messages.size > 0) {
-                            for (const message of messages) {
-                                if (message[1].author.bot === true) await message[1].delete();
-                            }
-                        }
-                        var options1 = []
-                        var options2 = []
-                        let count = 0;
-                        player_tags.data.items.forEach(player => {
-                            let { tag, name, role } = player
-                            if (count < 25) {
-                                count++
-                                let option = {
-                                    label: name,
-                                    value: tag
-                                }
-                                options1.push(option)
-                            }
-                            else {
-                                let option = {
-                                    label: name,
-                                    value: tag
-                                }
-                                options2.push(option)
-                            }
-
-                        })
-                        let row = new MessageActionRow()
-                            .addComponents(
-                                new MessageSelectMenu()
-                                    .setCustomId('player-selection')
-                                    .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options1)
-                                
-                            );
-
-                   
-                        await dm.send({ components: [row] })
-
-                        if (count >= 25){
-                            row = new MessageActionRow()
-                            .addComponents(
-                                new MessageSelectMenu()
-                                    .setCustomId('player-selection')
-                                    .setPlaceholder('Sélectionnez votre nom')
-                                    .addOptions(options2)
-                                
-                            );
-
-                            await dm.send({ components: [row] })
-                        }
-                        return await interaction.followUp({ content: `Parfait ${user}, un DM vient de t'être envoyé pour continuer avec l'étape de vérification!` })
-               
+                        await sendDmWithPlayers(user,player_tags,interaction)
 
                     }
                 }
-            } catch (e) {
+            } 
+            catch (e) {
                 if (e.name == 'DiscordAPIError') {
                     console.log(e);
                 }
-                // console.log(e);
                 return interaction.editReply({ content: `Désolé ${interaction.member}, je n'ai pas pu éxecuter ta demande` })
 
             }

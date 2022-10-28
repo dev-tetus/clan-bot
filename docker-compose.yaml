@@ -2,48 +2,31 @@ version: '3.4'
 
 services:
   reverse-proxy: # NGINX
-    image: nginx:1.21.1 # image with S.O
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: tetusrocus/nginx
     container_name: reverse-proxy-container
     environment:
       COMPOSE_PROJECT_NAME: 'ClanBot'
-    volumes: # association of config file from the host to the container
-      - ./nginx/nginx-conf.conf:/etc/nginx/nginx.conf 
-    depends_on:
-      - api-gateway
-      - bot
-      - python-api
     ports:
       - 5000:80 #Host:Container (Check nginx-conf.confg; container port is the same as what NGINX is listening to)
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
-      target: production
-    image: api-gateway
-    environment:
-      COMPOSE_PROJECT_NAME: 'ClanBot'
-    volumes:
-      - ./api-gateway:/api-gateway
-      - /api-gateway/node_modules
   bot:
     build:
       context: ./bot
       dockerfile: Dockerfile
       target: production
-    image: bot
+    image: tetusrocus/bot
     environment:
       COMPOSE_PROJECT_NAME: 'ClanBot'
-    volumes:
-      - ./bot:/bot
-      - /bot/node_modules
+
   python-api:
     build:
       context: ../BotPython
       dockerfile: Dockerfile
-    image: python-api
+    image: tetusrocus/python-api
     restart: always
     environment:
       COMPOSE_PROJECT_NAME: 'ClanBot'
       PYTHONUNBUFFERED: 1
-    volumes:
-      - ../BotPython:/app
+

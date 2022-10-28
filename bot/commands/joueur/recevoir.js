@@ -192,7 +192,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
 
@@ -201,7 +201,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -256,7 +256,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -264,7 +264,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -314,7 +314,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     console.log(messageToSend);
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
@@ -323,7 +323,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }
@@ -374,7 +374,7 @@ module.exports = {
                             try {
                                 if ((selectionCounterTrigger === collector.total - 1 && (collected.find(t => t._emoji.name == 'Checkmark')._emoji.name == 'Checkmark'))) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     console.log(messageToSend);
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
@@ -383,7 +383,7 @@ module.exports = {
                             } catch (error) {
                                 if (selectionCounterTrigger === collector.total) {
 
-                                    messageToSend = require('../../messages/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
+                                    messageToSend = require('../../messages/player/troopPetition')({ interaction, player: interaction.member.nickname, troops, darktroops, potions, siegeMachines })
                                     await chatChannel.send(messageToSend)
                                     await ticketChannel.delete()
                                 }

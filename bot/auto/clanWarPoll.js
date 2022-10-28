@@ -4,9 +4,8 @@ const schedule = require('node-schedule')
 
 const client = require("../index");
 const leagueWarDay = require('../requests/leagueWarDay')
-const clanWarPollEmbed = require('../messages/clanWarPoll.js')
-const clanWarMembersEmbed = require('../messages/clanWarMembers.js')
-const DISCORD_EPOCH = 1420070400000
+const clanWarPollEmbed = require('../messages/clan/clanWarPoll.js')
+const clanWarMembersEmbed = require('../messages/clan/clanWarMembers.js')
 
 const rule = new schedule.RecurrenceRule()
 rule.hour = [8, 12, 19]

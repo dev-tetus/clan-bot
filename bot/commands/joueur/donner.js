@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {axiosBase} = require('../../axios/axios');
 
-const messageDonationFunction = require('../../messages/troopDonation')
+const messageDonationFunction = require('../../messages/player/troopDonation')
 
 
 

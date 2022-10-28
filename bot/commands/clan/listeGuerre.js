@@ -32,7 +32,7 @@ module.exports = {
                         }
                     }
                     if(players.length > 0){
-                        const msg = require('../../messages/recrutedPlayerList')(players, 'GDC')
+                        const msg = require('../../messages/clan/recrutedPlayerList')(players, 'GDC')
                         console.log();
                         await leadersChannel.send(msg)
 

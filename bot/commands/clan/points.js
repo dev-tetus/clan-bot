@@ -14,7 +14,7 @@ module.exports = {
     run: async (client, interaction, args) => {
         await interaction.deferReply({ ephemeral: true }).catch(() => { });
 
-        const clanMembersResponse = await axiosBase.get(`/clans/${process.env.CLAN_TAG}`)
+        const clanMembersResponse = await axiosBase().get(`/clans/${process.env.CLAN_TAG}`)
 
         if (args.length > 0) {
             const user = await interaction.guild.members.fetch(args[0])

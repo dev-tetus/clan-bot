@@ -92,7 +92,7 @@ module.exports = {
         const chatChannel = await client.channels.cache.find(channel => channel.name === 'chat')
 
 
-        const clanMembersResponse = await axiosBase.get(`/clans/${process.env.CLAN_TAG}`)
+        const clanMembersResponse = await axiosBase().get(`/clans/${process.env.CLAN_TAG}`)
 
         const troopSelection = await ticketChannel.send({ content: `S'il te plaît, choisis le type d'emplacement à donner (Elixir, elixir noir ou/et des sorts)` })
 

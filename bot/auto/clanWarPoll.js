@@ -37,7 +37,7 @@ async function sendPoll() {
     var responseLeague = null
     var response = null
     try {
-        response = await axiosBase.get(`/clans/${process.env.CLAN_TAG}/currentwar`)
+        response = await axiosBase().get(`/clans/${process.env.CLAN_TAG}/currentwar`)
     } catch (error) {
         response = { data: { state: 'notFound' } }
     }
@@ -55,20 +55,19 @@ async function sendPoll() {
     //! Delete old list of recruted players
     // -- CHECK FOR WAR STATUS AND ITS WAR PHASES TIMESTAMPS AT CoC API
     for(var msg of votesChannelMessages.values()){
-        warDate =  response.data.state != "notFound" ? response.data.endTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
+        const warDate =  response.data.state != "notFound" ? response.data.endTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
         console.log(warDate);
         console.log(parseUnixDate(msg.embeds[0].timestamp));
         console.log(parseUnixDate(msg.embeds[0].timestamp) < warDate );
         if(warDate != null){
             if(!isNotInWar(response,responseLeague) && parseUnixDate(msg.embeds[0].timestamp) > warDate){
-                // console.log(warDate);
-                // console.log(parseUnixDate(msg.embeds[0].timestamp));
+           
                 console.log("Message delete");
                 await msg.delete()
             }
-            else if(isNotInWar(response,responseLeague)){
+            // else if(isNotInWar(response,responseLeague)){
                 
-            }
+            // }
 
         }
     }
@@ -78,13 +77,13 @@ async function sendPoll() {
 
     //! Delete all messages from annonces channel to send back again fresh ones
 
-    for (var msg of pinnedMessagesAnnoncesGuerre) {
+    for (let msg of pinnedMessagesAnnoncesGuerre) {
         await msg[1].delete()
     }
 
     //! Delete all messages from annonces channel to send back again fresh ones
 
-    for (var msg of pinnedMessagesAnnoncesLeagueChannel) {
+    for (let msg of pinnedMessagesAnnoncesLeagueChannel) {
         await msg[1].delete()
     }
     async function sendPollStatsMessage(type){
@@ -92,7 +91,7 @@ async function sendPoll() {
         for (var msg of votesChannelMessages.values()) {
             
             if (msg.embeds[0].description === 'Liste joueurs recrutés') {
-                getNextAnnouncementDate(schedule)
+                getNextAnnouncementDate()
                 return
             }
         }
@@ -133,7 +132,7 @@ async function sendPoll() {
     //! Casual war preparation phase
     if (response.data.state === 'preparation') {
         console.log('In preparation');
-        const message = require('../messages/clanWarPreparation')(response.data)
+        const message = require('../messages/inPrep/clanWarPreparation')(response.data)
         await clanWarAnnoncesChannel.send(message)
         await clanWarAnnoncesChannel.lastMessage.pin()
         await clanWarAnnoncesChannel.lastMessage.delete()
@@ -145,7 +144,7 @@ async function sendPoll() {
      //! Casual war war phase
     if (response.data.state === 'inWar') {
     console.log('Casual war started...');
-    const message = require('../messages/clanWarInWar')(response)
+    const message = require('../messages/inWar/clanWarInWar')(response)
     await clanWarAnnoncesChannel.send(message)
     await clanWarAnnoncesChannel.lastMessage.pin()
     await clanWarAnnoncesChannel.lastMessage.delete()
@@ -157,7 +156,7 @@ async function sendPoll() {
     }
     //! League war preparation phase
     if (responseLeague.data.state === 'preparation') {
-        const message = require('../messages/clanWarLeaguePreparation')(responseLeague.data)
+        const message = require('../messages/inPrep/clanWarLeaguePreparation')(responseLeague.data)
         await clanWarLeagueAnnoncesChannel.send(message)
         const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
         await channelPoll.pin()
@@ -175,7 +174,7 @@ async function sendPoll() {
 
 function scheduleJobAtTime(rule) {
     schedule.scheduleJob(rule, sendPoll)
-    return getNextAnnouncementDate(schedule)
+    return getNextAnnouncementDate()
 }
 function parseUnixDate(time) {
     date = new Date(value=time)

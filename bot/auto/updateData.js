@@ -6,8 +6,8 @@ rule.minute = '15'
 rule.tz = 'Europe/Madrid'
 
 async function updateData(){
-    axiosInternal().get('/flask/clan/members/update').then((r) => console.log(r))
-    axiosInternal().get('/flask/players/update').then((r) => console.log(r))
+    axiosInternal().get('/api/clan/members/update').then((r) => console.log(r))
+    axiosInternal().get('/api/players/update').then((r) => console.log(r))
 }
 
 module.exports = async () =>{

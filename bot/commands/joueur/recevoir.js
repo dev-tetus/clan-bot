@@ -1,4 +1,3 @@
-const {axiosBase} = require('../../axios/axios');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
 
@@ -273,7 +272,7 @@ module.exports = {
                         })
                         try {
                             await darkElixirSelection.react(`${client.emojis.cache.find(emoji => emoji.name == 'Checkmark')}`)
-                            for (var troop of darkTroops) {
+                            for (let troop of darkTroops) {
                                 await darkElixirSelection.react(`${await client.emojis.cache.find(emoji => emoji.name == troop.name)}`)
                             }
 

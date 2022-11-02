@@ -24,7 +24,7 @@ async function playerSignUp(client,user_tag,collected, interaction, channelAnnon
                     //Add To Database new player
                     await channelAnnoncesInvites.send({content: `${interaction.user} vient d'arriver en étant ${roles.newRole}!`})
                     await channelChatGeneral.send({ content:`Bienvenue ${interaction.user}!!`} )
-                    await axiosInternal().post("/api/clan/player/add",{tag:user_tag, username:server_member.username !== null ? server_member.nickname : server_member.user.name})
+                    await axiosInternal().post("/api/clan/player/add",{tag:user_tag, username:server_member.nickname !== null ? server_member.nickname : server_member.user.name})
                 }
                 return
             }

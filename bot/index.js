@@ -3,6 +3,7 @@ const { Client, Collection, Intents} = require("discord.js");
 
 try{
     const client = new Client({
+        restRequestTimeout: 60000,
         shards: 'auto',
         restTimeOffset:0,
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES,Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES],

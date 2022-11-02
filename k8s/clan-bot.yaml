@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-deployment
+  labels:
+    deployment: bot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: bot
+  template:
+    metadata:
+      name: bot-pod
+      labels:
+        pod: bot
+    spec:
+      containers:
+      - name: bot
+        image: tetusrocus/bot:latest
+        imagePullPolicy: Always
+        env:
+          - name: TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: bot-credentials
+                key: TOKEN
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: bot-credentials
+                key: CLIENT_ID
+          - name: GUILD_ID
+            valueFrom:
+              secretKeyRef:
+                name: bot-credentials
+                key: GUILD_ID
+          - name: CLAN_TAG
+            valueFrom:
+              secretKeyRef:
+                name: bot-credentials
+                key: CLAN_TAG
+          - name: COC_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: bot-credentials
+                key: COC_TOKEN
+
+
+---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: api-gateway-service
+#   labels:
+#     service: api-gateway-service
+# spec:
+#   selector:
+#     pod: nginx
+#   type: NodePort
+#   ports:
+#   - protocol: TCP
+#     port: 5000
+#     targetPort: nginx-port
+
+  

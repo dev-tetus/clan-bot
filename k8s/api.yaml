@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-api
+  labels:
+    app: python-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-api
+  template:
+    metadata:
+      labels:
+        app: python-api
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: python-api
+        image: tetusrocus/python-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+          - name: username
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: username
+          - name: password
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: password
+          - name: api_key
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: api_key
+          - name: base_url
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: base_url
+          - name: clan_tag
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: clan_tag
+          - name: spells_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: spells_csv
+          - name: troops_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: troops_csv
+          - name: heroes_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: heroes_csv
+          - name: buildings_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: buildings_csv
+          - name: texts_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: texts_csv
+          - name: pets_csv
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: pets_csv
+          - name: db_ip
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: db_ip
+          - name: db_user
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: db_user
+          - name: db_pass
+            valueFrom:
+              secretKeyRef:
+                name: api-credentials
+                key: db_pass
+
+          
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-api
+  labels:
+    app: python-api
+spec:
+  selector:
+    app: python-api
+  ports:
+  - protocol: TCP
+    port: 5000
+
+  

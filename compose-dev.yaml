@@ -21,21 +21,42 @@ services:
       target: dev
     image: bot
     environment:
-      COMPOSE_PROJECT_NAME: 'ClanBot'
+      - COMPOSE_PROJECT_NAME='ClanBot'
+      - TOKEN=$TOKEN
+      - CLIENT_ID=$CLIENT_ID
+      - CLAN_TAG=$CLAN_TAG
+      - GUILD_ID=$GUILD_ID
+      - COC_TOKEN=$COC_TOKEN
     volumes:
       - ./bot:/bot
       - /bot/node_modules
+    
   python-api:
     build:
       context: ../BotPython
       dockerfile: Dockerfile
+      target: dev
     image: python-api
     restart: always
     depends_on:
       - mysql
     environment:
-      COMPOSE_PROJECT_NAME: 'ClanBot'
-      PYTHONUNBUFFERED: 1
+      - COMPOSE_PROJECT_NAME='ClanBot'
+      - PYTHONUNBUFFERED=1
+      - username=$username
+      - password=$password
+      - api_key=$api_key
+      - base_url=$base_url
+      - clan_tag=$clan_tag
+      - spells_csv=$spells_csv
+      - troops_csv=$troops_csv
+      - heroes_csv=$heroes_csv
+      - buildings_csv=$buildings_csv
+      - texts_csv=$texts_csv
+      - pets_csv=$pets_csv
+      - db_ip=$db_ip
+      - db_user=$db_user
+      - db_pass=$db_pass
     volumes:
       - ../BotPython:/app
   mysql:

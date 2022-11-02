@@ -9,7 +9,7 @@ function axiosBase(){
 }   
 function axiosInternal(){
   return axios.create({
-    baseURL: 'http://reverse-proxy/',
+    baseURL: 'http://nginx-svc/',
   });
 }
 module.exports ={

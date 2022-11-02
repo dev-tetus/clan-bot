@@ -54,19 +54,20 @@ async function sendPoll() {
     //! Delete old list of recruted players
     // -- CHECK FOR WAR STATUS AND ITS WAR PHASES TIMESTAMPS AT CoC API
     for(var msg of votesChannelMessages.values()){
-        const warDate =  response.data.state != "notFound" ? response.data.endTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
-        console.log(warDate);
-        console.log(parseUnixDate(msg.embeds[0].timestamp));
-        console.log(parseUnixDate(msg.embeds[0].timestamp) < warDate );
+        const warDate =  response.data.state != "notFound" ? response.data.preparationStartTime: (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
+
         if(warDate != null){
             if(!isNotInWar(response,responseLeague) && parseUnixDate(msg.embeds[0].timestamp) > warDate){
            
                 console.log("Message delete");
                 await msg.delete()
-            }
-            // else if(isNotInWar(response,responseLeague)){
+                await axiosInternal().post("/clan/player/votes/reset")
                 
-            // }
+            }
+            else{
+                console.log("Poll message for next war");
+            }
+
 
         }
     }

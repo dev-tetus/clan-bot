@@ -3,7 +3,8 @@ node_modules/
 */ignore/
 
 
-.env
+.env*
+config.yaml
 
 
 #IDE plugins data

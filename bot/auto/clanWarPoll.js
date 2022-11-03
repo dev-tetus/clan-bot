@@ -54,7 +54,8 @@ async function sendPoll() {
     //! Delete old list of recruted players
     // -- CHECK FOR WAR STATUS AND ITS WAR PHASES TIMESTAMPS AT CoC API
     for(var msg of votesChannelMessages.values()){
-        const warDate =  response.data.state != "notFound" ? response.data.preparationStartTime: (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
+        //response.data.state != "notFound" || response.data.state != "notInWar" || response.data.state != "warEnded"
+        const warDate =  !notWarStatus.includes(response.data.state) ? response.data.preparationStartTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
 
         if(warDate != null){
             if(!isNotInWar(response,responseLeague) && parseUnixDate(msg.embeds[0].timestamp) > warDate){

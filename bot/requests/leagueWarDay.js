@@ -1,4 +1,4 @@
-const axiosBase = require('../axios/axios')
+const {axiosBase} = require('../axios/axios')
 const clanWarLeagueInWarEmbed = require('../messages/inWar/clanWarLeagueInWar')
 
 
@@ -25,7 +25,7 @@ async function assignData(home,leagueWarResponse,i){
     return
 }
 module.exports = async (clanWarLeagueAnnoncesChannel) =>{
-    const leagueResponse = await axios.get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
+    const leagueResponse = await axiosBase().get(`/clans/${process.env.CLAN_TAG}/currentwar/leaguegroup`)
     const rounds = leagueResponse.data.rounds
 
     rounds.forEach(async (round,i) =>{

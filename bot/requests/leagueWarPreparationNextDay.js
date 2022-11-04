@@ -1,4 +1,4 @@
-const axiosBase = require('../axios/axios')
+const {axiosBase} = require('../axios/axios')
 const clanWarLeagueInWarEmbed = require('../messages/inWar/clanWarLeagueInWar')
 
 module.exports = async (clanWarLeagueAnnoncesChannel) =>{

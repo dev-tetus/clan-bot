@@ -1,8 +1,8 @@
 const schedule = require('node-schedule')
 const {axiosInternal} = require('../axios/axios')
 const rule = new schedule.RecurrenceRule()
-rule.hour = '00'
-rule.minute = '15'
+rule.hour = '23'
+rule.minute = '30'
 rule.tz = 'Europe/Madrid'
 
 async function updateLeagueWars(){

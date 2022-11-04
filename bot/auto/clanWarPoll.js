@@ -102,7 +102,7 @@ async function sendPoll() {
     //! If no war in progress and no league war 
     
     //! Beginning of month (start of league)
-    if ((today >= 1 && today <= 5) && (responseLeague.data.state != "inWar" || responseLeague.data.state != "preparation")) {
+    if ((today > 28 || today <= 5) && (responseLeague.data.state != "inWar" || responseLeague.data.state != "preparation")) {
         await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
         const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
         try {

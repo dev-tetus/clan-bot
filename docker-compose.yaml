@@ -6,7 +6,6 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
-      target: production
     image: tetusrocus/nginx
     container_name: reverse-proxy-container
     environment:

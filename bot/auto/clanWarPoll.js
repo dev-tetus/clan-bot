@@ -1,9 +1,8 @@
 require('dotenv').config()
-const {axiosBase} = require('../axios/axios')
+const {axiosBase,axiosInternal} = require('../axios/axios')
 const schedule = require('node-schedule')
 
 const client = require("../index");
-const leagueWarDay = require('../requests/leagueWarDay')
 const clanWarPollEmbed = require('../messages/clan/clanWarPoll.js')
 const clanWarMembersEmbed = require('../messages/clan/clanWarMembers.js')
 
@@ -24,7 +23,7 @@ function getNextAnnouncementDate() {
 }
 
 function isNotInWar(response, responseLeague){
-    if(inWarStatus.includes(response.data.state) || inWarStatus.includes(responseLeague.data.status)) return false
+    if(inWarStatus.includes(response.data.state) || inWarStatus.includes(responseLeague.data.state)) return false
     else return true
 }
 
@@ -55,8 +54,9 @@ async function sendPoll() {
     // -- CHECK FOR WAR STATUS AND ITS WAR PHASES TIMESTAMPS AT CoC API
     for(var msg of votesChannelMessages.values()){
         //response.data.state != "notFound" || response.data.state != "notInWar" || response.data.state != "warEnded"
-        const warDate =  !notWarStatus.includes(response.data.state) ? response.data.preparationStartTime : (() =>{ return responseLeague.data.reason != "notFound" ? responseLeague.data.startTime : null})()
-
+        const warDate =  !notWarStatus.includes(response.data.state) ? response.data.preparationStartTime : (() =>{ return !notWarStatus.includes(responseLeague.data.state) ? new Date(responseLeague.data.season + '-01').toISOString() : null})()
+        console.log(new Date(responseLeague.data.season + '-01').toISOString());
+        console.log(!isNotInWar(response,responseLeague));
         if(warDate != null){
             if(!isNotInWar(response,responseLeague) && parseUnixDate(msg.embeds[0].timestamp) > warDate){
            
@@ -102,13 +102,14 @@ async function sendPoll() {
     //! If no war in progress and no league war 
     
     //! Beginning of month (start of league)
-    if ((today > 28 || today <= 5) && (responseLeague.data.state != "inWar" || responseLeague.data.state != "preparation")) {
+    if ((today > 28 || today <= 5) && (responseLeague.data.state != "inWar" && responseLeague.data.state != "preparation")) {
         await clanWarLeagueAnnoncesChannel.send(clanWarPollEmbed('LDC'))
         const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
         try {
             await channelPoll.pin()
             await clanWarLeagueAnnoncesChannel.lastMessage.delete()
             await sendPollStatsMessage("LDC")
+            return
 
         } catch (error) {
             console.log(error);
@@ -116,7 +117,7 @@ async function sendPoll() {
 
     }
     //! Casual war
-    else if ((response.data.state === 'warEnded' || response.data.state === 'notInWar') && (responseLeague.data.reason === 'notFound' || responseLeague.data.state === 'ended' || responseLeague.data.state === 'notInWar')){
+    else if ((response.data.state === 'warEnded' || response.data.state === 'notInWar')){
         await clanWarAnnoncesChannel.send(clanWarPollEmbed('GDC'))
         const channelPoll = await clanWarAnnoncesChannel.lastMessage
         try {
@@ -179,6 +180,7 @@ function scheduleJobAtTime(rule) {
 }
 function parseUnixDate(time) {
     date = new Date(value=time)
+    console.log(date);
     return date.toISOString().replace(/[:-]/g,"")
 }
 async function sendPollLogic() {

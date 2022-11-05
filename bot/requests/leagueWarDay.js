@@ -2,7 +2,7 @@ const {axiosBase} = require('../axios/axios')
 const clanWarLeagueInWarEmbed = require('../messages/inWar/clanWarLeagueInWar')
 
 
-async function assignData(home,leagueWarResponse,i){
+async function assignData(home,leagueWarResponse,i,clanWarLeagueAnnoncesChannel){
     const data ={
         'starsPerAttack': home ? (leagueWarResponse.data.clan.stars/leagueWarResponse.data.clan.attacks).toFixed(2) : (leagueWarResponse.data.opponent.stars/leagueWarResponse.data.opponent.attacks).toFixed(2),
         'starsPerAttackEnemy':home ? (leagueWarResponse.data.opponent.stars/leagueWarResponse.data.opponent.attacks).toFixed(2):(leagueWarResponse.data.clan.stars/leagueWarResponse.data.clan.attacks).toFixed(2),
@@ -17,7 +17,7 @@ async function assignData(home,leagueWarResponse,i){
         'enemyStars':home ?  leagueWarResponse.data.opponent.stars:leagueWarResponse.data.clan.stars,
         'endTime': leagueWarResponse.data.endTime
     }
-    const message = clanWarLeagueInWarEmbed(data)
+    const message = clanWarLeagueInWarEmbed(data, true)
     await clanWarLeagueAnnoncesChannel.send(message)
     const channelPoll = await clanWarLeagueAnnoncesChannel.lastMessage
     await channelPoll.pin()
@@ -33,10 +33,10 @@ module.exports = async (clanWarLeagueAnnoncesChannel) =>{
             var leagueWarResponse = await axiosBase().get(`/clanwarleagues/wars/${warLeagueTag.replace('#','%23')}`)
             if(leagueWarResponse.data.state === 'inWar'){
                 if(leagueWarResponse.data.clan.name === 'SN3T'){
-                    return assignData(true,leagueWarResponse,i)
+                    return assignData(true,leagueWarResponse,i,clanWarLeagueAnnoncesChannel)
                 }
                 else if(leagueWarResponse.data.opponent.name === 'SN3T'){
-                    return assignData(false, leagueWarResponse,i)
+                    return assignData(false, leagueWarResponse,i,clanWarLeagueAnnoncesChannel)
                 }
             }
         })
